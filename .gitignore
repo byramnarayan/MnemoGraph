@@ -1,0 +1,28 @@
+@"
+# Environment & Secrets (NEVER COMMIT)
+**/.env
+**/.env.*
+*.env
+!.env.example
+
+# Python cache & virtualenvs
+**/__pycache__/
+**/*.py[cod]
+**/*$py.class
+**/.pytest_cache/
+**/.venv/
+**/venv/
+
+# Next.js & Frontend dependencies
+**/node_modules/
+**/.next/
+**/out/
+**/dist/
+**/build/
+
+# OS / IDE
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+"@ | Set-Content .gitignore

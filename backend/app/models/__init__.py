@@ -1,0 +1,70 @@
+from app.core.database import Base
+from app.models.connector import (
+    ConnectorConfig,
+    ConnectorSyncJob,
+    Department,
+    Document,
+    DocumentMetadata,
+    DocumentVersion,
+    Permission,
+    Person,
+    Project,
+    SourceEntity,
+    Team,
+)
+from app.models.provenance import (
+    Artifact,
+    Decision,
+    DecisionLink,
+    Meeting,
+    ProvenanceRecord,
+    Task,
+    Ticket,
+)
+from app.models.document_section import (
+    DecisionMention,
+    DocumentMention,
+    DocumentSection,
+    ExtractedEntity,
+    ProjectMention,
+)
+from app.models.sync_reconciliation_job import (
+    AnswerValidationLog,
+    DocumentVersionState,
+    PermissionPolicy,
+    SyncReconciliationJob,
+)
+from app.models.user import PasswordResetToken, User
+
+__all__ = [
+    "Base",
+    "User",
+    "PasswordResetToken",
+    "ConnectorConfig",
+    "ConnectorSyncJob",
+    "SourceEntity",
+    "DocumentMetadata",
+    "DocumentVersion",
+    "Permission",
+    "Person",
+    "Team",
+    "Department",
+    "Project",
+    "Document",
+    "Decision",
+    "Task",
+    "Ticket",
+    "Meeting",
+    "Artifact",
+    "ProvenanceRecord",
+    "DecisionLink",
+    "DocumentSection",
+    "ExtractedEntity",
+    "DocumentMention",
+    "ProjectMention",
+    "DecisionMention",
+    "SyncReconciliationJob",
+    "DocumentVersionState",
+    "PermissionPolicy",
+    "AnswerValidationLog",
+]

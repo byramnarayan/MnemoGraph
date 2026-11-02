@@ -1,0 +1,33 @@
+# Create or append to .gitignore
+@"
+# Environment & Secrets
+.env
+.env.*
+!.env.example
+
+# Python cache & artifacts
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.pytest_cache/
+.coverage
+
+# Virtual environments
+.venv/
+env/
+venv/
+
+# Next.js & Frontend builds
+node_modules/
+.next/
+out/
+dist/
+build/
+
+# IDE & OS
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+"@ | Set-Content .gitignore

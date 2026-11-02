@@ -1,0 +1,39 @@
+[project]
+name = "backend"
+version = "0.1.0"
+description = "Add your description here"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "aiosmtplib>=5.1.2",
+    "aiosqlite>=0.22.1",
+    "alembic>=1.18.5",
+    "beautifulsoup4>=4.15.0",
+    "boto3>=1.43.62",
+    "databricks-sql-connector>=4.6.0",
+    "datasets>=5.0.1",
+    "dlt>=1.30.0",
+    "docling>=2.123.1",
+    "falkordb>=1.8.1",
+    "fastapi[standard]>=0.139.2",
+    "fastembed>=0.9.1",
+    "graphiti-core[falkordb]>=0.31.2",
+    "groq>=1.7.0",
+    "neo4j>=6.3.0",
+    "pandas>=3.0.5",
+    "pillow>=12.3.0",
+    "psycopg2-binary>=2.9.12",
+    "psycopg[binary]>=3.3.4",
+    "pwdlib[argon2]>=0.3.0",
+    "pydantic-settings>=2.14.2",
+    "pyjwt>=2.13.0",
+    "pymgclient>=1.6.0",
+    "pypdf>=6.19.0",
+    "pytest>=9.2.0",
+    "pytest-asyncio>=1.4.1",
+    "qdrant-client>=1.19.1",
+    "reportlab>=5.0.1",
+    "routers>=0.1.2",
+    "sentence-transformers>=6.0.0",
+    "sqlalchemy>=2.0.51",
+]
