@@ -30,12 +30,19 @@ class FalkorDBClient:
 
     def get_graph(self):
         if not self._client:
-            kwargs: dict[str, Any] = {"host": self.host, "port": self.port}
-            if self.username:
-                kwargs["username"] = self.username
-            if self.password:
-                kwargs["password"] = self.password
-            self._client = FalkorDB(**kwargs)
+            # FalkorDB.from_url natively supports both local and FalkorDB Cloud:
+            # e.g., falkors://default:password@eu-west-1.cloud.falkordb.com:port
+            # or falkordb://localhost:6379
+            try:
+                self._client = FalkorDB.from_url(self.url)
+            except Exception:
+                kwargs: dict[str, Any] = {"host": self.host, "port": self.port}
+                if self.username:
+                    kwargs["username"] = self.username
+                if self.password:
+                    kwargs["password"] = self.password
+                self._client = FalkorDB(**kwargs)
+
             self._graph = self._client.select_graph(self.graph_name)
         return self._graph
 
