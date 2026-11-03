@@ -34,4 +34,3 @@ api_router.include_router(permissions.router, prefix="", tags=["Permissions"])
 api_router.include_router(answer_validation.router, prefix="", tags=["Answer Quality Validation"])
 api_router.include_router(provenance.router, prefix="", tags=["Provenance Cross-Links"])
 api_router.include_router(entities.router, prefix="", tags=["Entities & Provenance"])
-

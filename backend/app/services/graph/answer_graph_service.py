@@ -99,4 +99,3 @@ class AnswerGraphService:
             "decisions": decisions,
             "relation_path": paths,
         }
-

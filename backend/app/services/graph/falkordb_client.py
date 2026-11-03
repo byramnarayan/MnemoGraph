@@ -19,11 +19,17 @@ class FalkorDBClient:
         self.url = url or settings.falkordb_url
         self.graph_name = graph_name or settings.falkordb_graph_name
 
-        parsed = urlparse(self.url)
-        self.host = parsed.hostname or "localhost"
-        self.port = parsed.port or 6379
-        self.username = parsed.username
-        self.password = parsed.password
+        try:
+            parsed = urlparse(self.url)
+            self.host = parsed.hostname or "localhost"
+            self.port = parsed.port or 6379
+            self.username = parsed.username
+            self.password = parsed.password
+        except Exception:
+            self.host = "localhost"
+            self.port = 6379
+            self.username = None
+            self.password = None
 
         self._client: FalkorDB | None = None
         self._graph = None

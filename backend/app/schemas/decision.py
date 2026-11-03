@@ -34,6 +34,9 @@ class DecisionDetailResponse(BaseModel):
     title: str
     description: str | None = None
     status: str
+    impact: str | None = None
+    learnings: str | None = None
+    timeline: str | None = None
     project_id: str | None = None
     workspace_id: str | None = None
     source_document_id: str | None = None

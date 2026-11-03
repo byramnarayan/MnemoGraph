@@ -3,12 +3,13 @@ from __future__ import annotations
 import uuid
 from datetime import UTC, datetime
 
-from sqlalchemy import DateTime, ForeignKey, Integer, String, Text
+from sqlalchemy import DateTime, Float, ForeignKey, Integer, String, Text
 from sqlalchemy.orm import Mapped, mapped_column, relationship
 
 from app.core.database import Base
 
 
+# 1. Decision Table (Matches live PostgreSQL schema)
 class Decision(Base):
     __tablename__ = "decisions"
 
@@ -31,6 +32,7 @@ class Decision(Base):
     )
 
 
+# 2. Task
 class Task(Base):
     __tablename__ = "tasks"
 
@@ -50,6 +52,7 @@ class Task(Base):
     )
 
 
+# 3. Ticket
 class Ticket(Base):
     __tablename__ = "tickets"
 
@@ -69,6 +72,7 @@ class Ticket(Base):
     )
 
 
+# 4. Meeting
 class Meeting(Base):
     __tablename__ = "meetings"
 
@@ -83,6 +87,7 @@ class Meeting(Base):
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=lambda: datetime.now(UTC))
 
 
+# 5. Artifact
 class Artifact(Base):
     __tablename__ = "artifacts"
 
@@ -96,6 +101,7 @@ class Artifact(Base):
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=lambda: datetime.now(UTC))
 
 
+# 6. ProvenanceRecord
 class ProvenanceRecord(Base):
     __tablename__ = "provenance_records"
 
@@ -110,6 +116,7 @@ class ProvenanceRecord(Base):
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=lambda: datetime.now(UTC))
 
 
+# 7. DecisionLink
 class DecisionLink(Base):
     __tablename__ = "decision_links"
 
@@ -121,6 +128,7 @@ class DecisionLink(Base):
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=lambda: datetime.now(UTC))
 
 
+# 8. KnowledgeHandover
 class KnowledgeHandover(Base):
     __tablename__ = "knowledge_handovers"
 
@@ -139,6 +147,7 @@ class KnowledgeHandover(Base):
     )
 
 
+# 9. ProjectMember
 class ProjectMember(Base):
     __tablename__ = "project_members"
 
@@ -147,4 +156,3 @@ class ProjectMember(Base):
     person_id: Mapped[str] = mapped_column(String(36), index=True, nullable=False)
     role: Mapped[str] = mapped_column(String(100), default="Contributor", nullable=False)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=lambda: datetime.now(UTC))
-
