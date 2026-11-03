@@ -17,6 +17,7 @@ export interface GraphEdge {
   source: string;
   target: string;
   relation: string;
+  properties?: Record<string, any>;
 }
 
 interface GraphCanvasProps {
@@ -26,10 +27,25 @@ interface GraphCanvasProps {
   onNodeClick?: (node: GraphNode) => void;
 }
 
+const NODE_COLORS: Record<string, string> = {
+  Notebook: '#38bdf8',
+  File: '#64748b',
+  Document: '#0ea5e9',
+  Project: '#f59e0b',
+  Decision: '#8b5cf6',
+  Person: '#10b981',
+  Employee: '#10b981',
+  Team: '#06b6d4',
+  Workspace: '#a855f7',
+  EpisodeMemory: '#ec4899',
+  Task: '#f97316',
+  Ticket: '#ef4444',
+};
+
 export function GraphCanvas({
   nodes,
   edges,
-  height = 360,
+  height = 420,
   onNodeClick,
 }: GraphCanvasProps) {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
@@ -59,7 +75,7 @@ export function GraphCanvas({
     simulationNodes.forEach((n) => nodeMap.set(n.id, n));
 
     // Simple 2D spring force layout steps
-    for (let step = 0; step < 40; step++) {
+    for (let step = 0; step < 45; step++) {
       // Repulsion between nodes
       for (let i = 0; i < simulationNodes.length; i++) {
         for (let j = i + 1; j < simulationNodes.length; j++) {
@@ -68,8 +84,8 @@ export function GraphCanvas({
           const dx = b.x - a.x;
           const dy = b.y - a.y;
           const dist = Math.sqrt(dx * dx + dy * dy) || 1;
-          if (dist < 180) {
-            const force = (180 - dist) / dist * 0.5;
+          if (dist < 160) {
+            const force = ((160 - dist) / dist) * 0.45;
             a.x -= dx * force * 0.1;
             a.y -= dy * force * 0.1;
             b.x += dx * force * 0.1;
@@ -86,8 +102,8 @@ export function GraphCanvas({
           const dx = tgt.x - src.x;
           const dy = tgt.y - src.y;
           const dist = Math.sqrt(dx * dx + dy * dy) || 1;
-          const desiredDist = 120;
-          const force = (dist - desiredDist) / dist * 0.1;
+          const desiredDist = 110;
+          const force = ((dist - desiredDist) / dist) * 0.08;
           src.x += dx * force;
           src.y += dy * force;
           tgt.x -= dx * force;
@@ -97,8 +113,8 @@ export function GraphCanvas({
 
       // Keep within canvas bounds
       simulationNodes.forEach((n) => {
-        n.x = Math.max(40, Math.min(width - 40, n.x));
-        n.y = Math.max(40, Math.min(canvasHeight - 40, n.y));
+        n.x = Math.max(45, Math.min(width - 45, n.x));
+        n.y = Math.max(45, Math.min(canvasHeight - 45, n.y));
       });
     }
 
@@ -113,11 +129,30 @@ export function GraphCanvas({
         ctx.beginPath();
         ctx.moveTo(src.x, src.y);
         ctx.lineTo(tgt.x, tgt.y);
-        ctx.strokeStyle = '#475569';
-        ctx.lineWidth = 1.5;
-        ctx.stroke();
 
-        // Edge label
+        const relUpper = (edge.relation || '').toUpperCase();
+        if (relUpper.includes('CAUSED_RECURRENCE') || relUpper.includes('BLOCKED_BY')) {
+          ctx.strokeStyle = '#ef4444';
+          ctx.lineWidth = 2.4;
+          ctx.setLineDash([5, 3]);
+        } else if (relUpper.includes('PREVENTED_RECURRENCE')) {
+          ctx.strokeStyle = '#10b981';
+          ctx.lineWidth = 2.0;
+          ctx.setLineDash([]);
+        } else if (relUpper.includes('RAISED_FROM')) {
+          ctx.strokeStyle = '#f97316';
+          ctx.lineWidth = 1.8;
+          ctx.setLineDash([]);
+        } else {
+          ctx.strokeStyle = '#475569';
+          ctx.lineWidth = 1.3;
+          ctx.setLineDash([]);
+        }
+
+        ctx.stroke();
+        ctx.setLineDash([]); // reset
+
+        // Draw Edge Label
         const midX = (src.x + tgt.x) / 2;
         const midY = (src.y + tgt.y) / 2;
         ctx.fillStyle = '#94a3b8';
@@ -131,23 +166,24 @@ export function GraphCanvas({
       ctx.beginPath();
       ctx.arc(n.x, n.y, 16, 0, 2 * Math.PI);
 
-      // Color by label
-      if (n.label === 'Person') ctx.fillStyle = '#3b82f6';
-      else if (n.label === 'Team') ctx.fillStyle = '#10b981';
-      else if (n.label === 'Project') ctx.fillStyle = '#f59e0b';
-      else if (n.label === 'Decision') ctx.fillStyle = '#8b5cf6';
-      else ctx.fillStyle = '#64748b';
-
+      const fillColor = NODE_COLORS[n.label] || '#64748b';
+      ctx.fillStyle = fillColor;
       ctx.fill();
-      ctx.strokeStyle = '#1e293b';
+
+      ctx.strokeStyle = '#0f172a';
       ctx.lineWidth = 2;
       ctx.stroke();
 
       // Node label text
       ctx.fillStyle = '#f8fafc';
       ctx.font = '10px monospace';
-      const labelText = n.properties?.name || n.properties?.title || n.id.split(':').pop() || n.label;
-      ctx.fillText(labelText.slice(0, 14), n.x - 24, n.y + 28);
+      const labelText =
+        n.properties?.name ||
+        n.properties?.title ||
+        n.properties?.city ||
+        n.id.split(':').pop() ||
+        n.label;
+      ctx.fillText(String(labelText).slice(0, 16), n.x - 28, n.y + 26);
     });
 
     // Canvas click detection
@@ -160,7 +196,7 @@ export function GraphCanvas({
       for (const n of simulationNodes) {
         const dx = clickX - n.x;
         const dy = clickY - n.y;
-        if (Math.sqrt(dx * dx + dy * dy) <= 18) {
+        if (Math.sqrt(dx * dx + dy * dy) <= 20) {
           hit = n;
           break;
         }
@@ -179,20 +215,53 @@ export function GraphCanvas({
 
   return (
     <div className="relative w-full rounded-sm border border-border/70 bg-card/40 overflow-hidden font-mono">
-      <div className="absolute top-2 left-3 z-10 flex items-center gap-2">
-        <Tag tone="accent">GRAPH TOPOLOGY</Tag>
-        <span className="text-[10px] text-muted-foreground uppercase">
-          {nodes.length} Nodes &bull; {edges.length} Edges
-        </span>
+      {/* Top Bar with Counts and Legend */}
+      <div className="p-2 px-3 border-b border-border/50 bg-background/50 flex flex-wrap items-center justify-between gap-2 text-xs">
+        <div className="flex items-center gap-2">
+          <Tag tone="accent">ENTERPRISE GRAPH TOPOLOGY</Tag>
+          <span className="text-[11px] text-muted-foreground uppercase">
+            {nodes.length} Nodes &bull; {edges.length} Edges
+          </span>
+        </div>
+        <div className="flex flex-wrap items-center gap-2 text-[10px]">
+          <span className="flex items-center gap-1"><span className="w-2.5 h-2.5 rounded-full bg-sky-400 inline-block" /> Notebook</span>
+          <span className="flex items-center gap-1"><span className="w-2.5 h-2.5 rounded-full bg-slate-500 inline-block" /> File</span>
+          <span className="flex items-center gap-1"><span className="w-2.5 h-2.5 rounded-full bg-amber-500 inline-block" /> Project</span>
+          <span className="flex items-center gap-1"><span className="w-2.5 h-2.5 rounded-full bg-purple-500 inline-block" /> Decision</span>
+          <span className="flex items-center gap-1"><span className="w-2.5 h-2.5 rounded-full bg-emerald-500 inline-block" /> Person</span>
+          <span className="flex items-center gap-1"><span className="w-2.5 h-2.5 rounded-full bg-cyan-500 inline-block" /> Team</span>
+        </div>
       </div>
 
       {selectedNode && (
-        <div className="absolute top-2 right-3 z-10 p-2 rounded-xs border border-accent/40 bg-card/90 shadow-lg text-[10px] space-y-1 max-w-xs">
-          <div className="flex items-center justify-between">
-            <span className="text-accent font-semibold">{selectedNode.label}</span>
-            <button onClick={() => setSelectedNode(null)} className="text-muted-foreground hover:text-foreground">✕</button>
+        <div className="absolute top-12 right-3 z-10 p-3 rounded border border-accent/50 bg-card/95 shadow-xl text-xs space-y-2 max-w-sm">
+          <div className="flex items-center justify-between border-b border-border/60 pb-1.5">
+            <span
+              className="font-bold text-[11px] px-1.5 py-0.5 rounded text-white"
+              style={{ backgroundColor: NODE_COLORS[selectedNode.label] || '#64748b' }}
+            >
+              {selectedNode.label}
+            </span>
+            <button
+              onClick={() => setSelectedNode(null)}
+              className="text-muted-foreground hover:text-foreground text-sm font-bold ml-2"
+            >
+              ✕
+            </button>
           </div>
-          <div className="text-foreground truncate">{selectedNode.id}</div>
+          <div className="text-[11px] font-bold text-foreground truncate">{selectedNode.id}</div>
+          {selectedNode.properties && Object.keys(selectedNode.properties).length > 0 && (
+            <div className="text-[10px] space-y-1 max-h-48 overflow-y-auto pr-1">
+              {Object.entries(selectedNode.properties).map(([k, v]) => (
+                <div key={k} className="flex justify-between gap-2 border-b border-border/30 py-0.5">
+                  <span className="text-muted-foreground capitalize">{k.replace(/_/g, ' ')}:</span>
+                  <span className="text-foreground text-right font-medium truncate max-w-[160px]">
+                    {typeof v === 'object' ? JSON.stringify(v) : String(v)}
+                  </span>
+                </div>
+              ))}
+            </div>
+          )}
         </div>
       )}
 
@@ -205,4 +274,3 @@ export function GraphCanvas({
     </div>
   );
 }
-

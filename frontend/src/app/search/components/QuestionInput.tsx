@@ -12,10 +12,10 @@ export function QuestionInput({ onAsk, loading }: QuestionInputProps) {
   const [query, setQuery] = useState('');
 
   const suggestions = [
-    'What caused the Diameter signaling storm during VoNR rollout?',
-    'What are the O-RAN 7.2x fronthaul latency constraints?',
-    'How does SUPI anonymization protect 5G subscriber identity?',
-    'Who is responsible for BSS wholesale roaming TAP3 mediation?',
+    'Which Databricks notebooks are associated with data pipelines?',
+    'What architectural decisions were logged for project infrastructure?',
+    'Who are the authors and teams responsible for core notebooks?',
+    'Show relationships between projects and ingested document files',
   ];
 
   const handleSubmit = (e: React.FormEvent) => {

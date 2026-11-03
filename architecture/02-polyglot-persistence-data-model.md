@@ -363,41 +363,77 @@ CREATE TABLE memory_entities (
 
 ---
 
-## 3. FalkorDB Property Graph Schema
+## 3. FalkorDB Property Graph Schema & Enterprise Ontology Mapping
 
-The property graph schema is defined via Enums in `app/services/graph/schema.py` and instantiated across `app/services/graph/` repositories:
+The property graph schema is defined via Enums in `app/services/graph/schema.py` and extended by the formal **Aarohan Digital Networks** enterprise ontology (`architecture/ontology.yaml`). It unifies operational entities into 7 functional domains:
 
-### 3.1 Node Labels (`NodeLabel`)
+### 3.1 Node Labels & Identity Schemes
 
-| Label | Primary ID Key | Standard Properties | Codebase Reference |
-| :--- | :--- | :--- | :--- |
-| `:Person` | `person:{email}` | `id`, `name`, `email`, `role`, `team_id`, `department_id` | `Person` ORM & FalkorDB Client |
-| `:Team` | `team:{name}` | `id`, `name`, `department_id` | `Team` ORM & Sync Scripts |
-| `:Department`| `dept:{name}` | `id`, `name` | `Department` ORM |
-| `:Project` | `project:{name}` | `id`, `name`, `workspace_id`, `description` | `Project` ORM |
-| `:Workspace` | `ws:{id}` | `id`, `name`, `host` | Databricks Connector |
-| `:Document` | `doc:{id}` | `id`, `title`, `source_id`, `source_system`, `storage_key` | `Document` ORM |
-| `:Decision` | `decision:{id}` | `id`, `title`, `status`, `impact`, `project_id` | `Decision` ORM |
-| `:Task` | `task:{id}` | `id`, `title`, `status`, `assigned_to` | `Task` ORM |
-| `:Ticket` | `ticket:{id}` | `id`, `title`, `status` | `Ticket` ORM |
-| `:EpisodeMemory` | `UUID` | `id`, `session_id`, `query`, `summary`, `created_at` | `GraphitiClient` |
+| Domain | Node Label | Primary ID Key | Standard Properties | Codebase & Ontology Mapping |
+| :--- | :--- | :--- | :--- | :--- |
+| **Enterprise** | `:Company` | Singleton | `company_name`, `cin`, `incorporation_date`, `service_types` | Legal entity anchor for portfolio analysis |
+| **Spatial** | `:SiteLocation` | `SITE-XXXX` | `id`, `city`, `address` | Co-located offices & data centers |
+| **Organization**| `:Department` | `DEPT-XXXX` | `id`, `name`, `description` | `Department` ORM & functional divisions |
+| **Organization**| `:Team` | `TEAM-XXXX` | `id`, `name`, `department_id`, `primary_site_id` | `Team` ORM & squad hierarchy |
+| **Human Capital**| `:Employee` | `EMP-XXXX` | `id`, `full_name`, `email`, `role`, `skills`, `is_focal`, `status` | `Person` ORM alias with skill arrays |
+| **Human Capital**| `:RoleHistory` | `UUID` | `employee_id`, `job_title`, `start_date`, `end_date`, `reason` | Career velocity & promotion tracking |
+| **Delivery** | `:Project` | `PROJ-XXXX` | `id`, `name`, `status`, `planned_end_date`, `actual_end_date` | `Project` ORM & initiative tracker |
+| **Delivery** | `:Milestone` | `UUID` | `project_id`, `name`, `target_date`, `actual_completion_date`, `delay_days` | Time-boxed project checkpoint |
+| **Retrospective**| `:LessonLearned` | `LL-XXXX` | `id`, `project_id`, `description`, `causal_incident_id`, `causal_decision_id` | Post-project organizational learning |
+| **Governance** | `:Decision` | `DEC-XXXX` | `id`, `title`, `decision_type`, `outcome`, `rationale`, `root_cause_analysis` | `Decision` ORM with RCA failure analysis |
+| **Reliability** | `:Incident` | `INC-XXXX` | `id`, `title`, `severity` (P1-P4), `incident_type`, `confirmed_cause` | `Ticket` ORM alias with outage timeline |
+| **Accountability**| `:FollowUpAction`| `ACT-XXXX` | `id`, `title`, `due_date`, `completion_date`, `status`, `effectiveness_label` | `Task` ORM alias with recurrence prevention |
+| **Records** | `:BusinessDocument`| `DOC-XXXX` | `id`, `title`, `document_type` (PIR, ADR, CAT, etc.), `status`, `successor_doc_id` | `Document` ORM alias with revision lineage |
+| **Infrastructure**| `:ServiceType` | `SVC-XXXX` | `id`, `name` | Telecom offerings (Broadband, FTTH, Leased Line) |
+| **Memory** | `:EpisodeMemory` | `UUID` | `id`, `session_id`, `query`, `summary`, `created_at` | `GraphitiClient` experiential overlay |
 
-### 3.2 Edge Types (`RelationType`)
+### 3.2 Directional & Causal Relationship Topology
 
+```cypher
+// Organizational Hierarchy & Spatial Topology
+(:Employee)-[:MEMBER_OF_TEAM]->(:Team)
+(:Team)-[:BELONGS_TO_DEPARTMENT]->(:Department)
+(:Team)-[:LOCATED_AT]->(:SiteLocation)
+(:Employee)-[:WORKS_FROM]->(:SiteLocation)
+(:Employee)-[:MANAGES {effective_from: date}]->(:Employee)
+(:Employee)-[:HAD_ROLE]->(:RoleHistory)
+
+// Project Delivery, Blockages & Checkpoints
+(:Employee)-[:LEADS]->(:Project)
+(:Employee)-[:CONTRIBUTES_TO]->(:Project)
+(:Project)-[:SPONSORED_BY]->(:Department)
+(:Project)-[:HAS_MILESTONE]->(:Milestone)
+(:Project)-[:HAS_LESSON]->(:LessonLearned)
+(:Project)-[:BLOCKED_BY_DECISION]->(:Decision)
+(:Project)-[:BLOCKED_BY_INCIDENT]->(:Incident)
+
+// Decision Governance & Rationale
+(:Decision)-[:MADE_BY]->(:Employee)
+(:Decision)-[:LINKED_TO_PROJECT]->(:Project)
+
+// Incident Outages & Causal Recurrence Chains
+(:Incident)-[:AFFECTS_SERVICE]->(:ServiceType)
+(:Incident)-[:AFFECTS_SITE]->(:SiteLocation)
+(:Incident)-[:LINKED_TO_PROJECT]->(:Project)
+(:Incident)-[:CAUSED_RECURRENCE {via_action_id: 'ACT-XXXX'}]->(:Incident)
+
+// Corrective Action Accountability & Resolution
+(:FollowUpAction)-[:RAISED_FROM_INCIDENT]->(:Incident)
+(:FollowUpAction)-[:RAISED_FROM_DECISION]->(:Decision)
+(:FollowUpAction)-[:ASSIGNED_TO]->(:Employee)
+(:FollowUpAction)-[:PREVENTED_RECURRENCE_OF]->(:Incident)
+
+// Documentation, Retrospectives & Revisions
+(:BusinessDocument)-[:DOCUMENTS]->(:AnyEntity)
+(:BusinessDocument)-[:AUTHORED_BY]->(:Employee)
+(:BusinessDocument)-[:SUPERSEDED_BY]->(:BusinessDocument)
+(:LessonLearned)-[:LESSON_CAUSED_BY_INCIDENT]->(:Incident)
+(:LessonLearned)-[:LESSON_CAUSED_BY_DECISION]->(:Decision)
+
+// Cognitive Memory Overlay
+(:Employee)-[:RECALLED {at: timestamp}]->(:EpisodeMemory)
+(:EpisodeMemory)-[:TOUCHED]->(:AnyEntity)
 ```
-(Person)   ──[:MEMBER_OF]──────► (Team)
-(Team)     ──[:BELONGS_TO]─────► (Department)
-(Workspace)──[:CONTAINS]───────► (Project)
-(Project)  ──[:CONTAINS]───────► (Document)
-(Person)   ──[:OWNS|AUTHORED_BY|CREATED_BY]─► (Document|Decision|Project)
-(Document) ──[:REFERENCES]─────► (Project|Document|Artifact)
-(Document) ──[:MENTIONS]───────► (Person|Team|Decision|Ticket)
-(Decision) ──[:DERIVED_FROM]───► (Document)
-(Decision) ──[:RELATED_TO]─────► (Project|Team)
-(Task)     ──[:DEPENDS_ON]─────► (Decision|Task)
-(Person)   ──[:HAS_PERMISSION {level: 'READ'}]─► (Document|Project)
-(Person)   ──[:RECALLED {at: timestamp}]───────► (EpisodeMemory)
-(EpisodeMemory)──[:TOUCHED]────► (Person|Project|Document|Decision)
 ```
 
 ---

@@ -57,7 +57,7 @@ The system uses four distinct datastores, each fulfilling an explicit, non-overl
 | Datastore | Technology & Client | Core Domain Responsibility in Codebase |
 | :--- | :--- | :--- |
 | **Relational Database** | PostgreSQL (Neon-compatible) via `SQLAlchemy 2.0` (async) | Primary system of record for users, permissions, document metadata, section breakdowns, extracted entities, synchronization jobs, and episodic chat logs. |
-| **Property Graph Database** | FalkorDB via `falkordb` Python client | Canonical enterprise topology (Persons, Teams, Projects, Documents, Decisions) and Graphiti temporal overlay (`:EpisodeMemory`, `:RECALLED`, `:TOUCHED`). |
+| **Property Graph Database** | FalkorDB via `falkordb` Python client | Canonical enterprise topology & causal ontology (`architecture/ontology.yaml`: Incidents, Decisions, Projects, Teams, Sites) and Graphiti temporal overlay (`:EpisodeMemory`, `:RECALLED`, `:TOUCHED`). |
 | **Dense Vector Database** | Qdrant via `qdrant-client` | Vector similarity search over segmented document chunks embedded using `FastEmbed` (`BAAI/bge-small-en-v1.5`, 384 dimensions). |
 | **Object Storage** | S3 / MinIO via `aioboto3` & `boto3` | Immutable storage of raw source files (PDF, DOCX, Markdown, PySpark notebooks, JSON, CSV) and avatar image files. |
 

@@ -1,0 +1,1278 @@
+# ============================================================
+# ontology.yaml — Aarohan Digital Networks Limited
+# Knowledge Graph Ontology for Telecom Enterprise Dataset
+# ============================================================
+# Purpose:
+#   This ontology defines every node class, relationship type,
+#   property, inference rule, and business pattern that the
+#   knowledge graph should represent, reason over, and surface
+#   for analytics, root-cause tracing, risk detection, and
+#   business growth opportunity identification.
+#
+# How to use:
+#   Feed this file to your graph platform
+#   (Neo4j, Neptune, Stardog, Oxigraph, etc.) as a schema
+#   configuration. Each section maps directly to node labels,
+#   edge types, property constraints, and SPARQL/Cypher rules.
+# ============================================================
+
+ontology_meta:
+  name: "Aarohan Digital Networks — Enterprise Knowledge Graph Ontology"
+  version: "1.0.0"
+  dataset_version: "dc25e11e255d"
+  as_of_date: "2025-01-01"
+  seed: 42
+  description: >
+    Formal ontology for the synthetic enterprise dataset of Aarohan Digital Networks
+    Limited, a fictional Indian integrated telecom operator. Covers organizational
+    structure, project lifecycle, decision quality, incident operations, corrective
+    accountability, and business documentation — all interconnected to enable
+    multi-hop knowledge graph queries and hidden-pattern discovery.
+
+
+# ============================================================
+# SECTION 1: NODE CLASSES (Graph Vertices)
+# ============================================================
+
+node_classes:
+
+  # ── ORGANIZATIONAL ──────────────────────────────────────
+
+  Company:
+    label: "Company"
+    description: >
+      Singleton node representing Aarohan Digital Networks Limited as a legal entity.
+      Central hub connecting all organizational, financial, and operational subgraphs.
+    real_example:
+      company_name: "Aarohan Digital Networks Limited"
+      cin: "U64200MH2003PLC042781"
+      registered_city: "Mumbai"
+      incorporation_date: "2003-01-01"
+    key_properties:
+      - company_name: { type: string, unique: true }
+      - cin: { type: string, length: 21, unique: true, description: "Synthetic Corporate Identification Number" }
+      - incorporation_date: { type: date }
+      - registered_city: { type: string }
+      - description: { type: string, min_length: 50, max_length: 300 }
+      - service_types: { type: list[string], min_items: 4, description: "Telecom services offered: Mobile Broadband, FTTH, Enterprise Leased Lines, etc." }
+    business_role: >
+      Anchor for all portfolio-level analysis: service coverage, market presence,
+      total incident exposure, and strategic decision history.
+
+  SiteLocation:
+    label: "SiteLocation"
+    description: >
+      A physical office or operations hub where employees, teams, and infrastructure
+      are co-located. Aarohan has 8 sites across Indian Tier-1 cities.
+    real_examples:
+      - id: "SITE-0001"
+        city: "Mumbai"
+        description: "Primary HQ and NOC hub, highest incident exposure site"
+      - id: "SITE-0002"
+        city: "Bengaluru"
+        description: "Engineering and transport operations hub"
+    key_properties:
+      - id: { type: string, prefix: "SITE-", format: "SITE-XXXX" }
+      - city: { type: string, allowed_values: [Mumbai, Delhi, Bengaluru, Hyderabad, Chennai, Kolkata, Pune, Ahmedabad] }
+      - address: { type: string }
+    business_role: >
+      Spatial risk concentration analysis: which cities carry the most incident load,
+      which sites are understaffed relative to their incident count.
+
+  Department:
+    label: "Department"
+    description: >
+      A functional division of Aarohan. The dataset contains 7 departments spanning
+      Network Operations, Product & Technology, Finance, HR, Sales & Marketing,
+      Legal & Compliance, Customer Experience, and Enterprise Services.
+    real_examples:
+      - id: "DEPT-0003"
+        name: "Network Operations"
+        role: "24x7 monitoring, incident response, capacity management"
+      - id: "DEPT-0005"
+        name: "Product & Technology"
+        role: "Technology architecture, engineering delivery"
+      - id: "DEPT-0004"
+        name: "Customer Experience"
+        role: "Customer care, NPS, complaint resolution"
+    key_properties:
+      - id: { type: string, prefix: "DEPT-" }
+      - name: { type: string, allowed_values: [Network Operations, "Product & Technology", Finance, HR, "Sales & Marketing", "Legal & Compliance", "Customer Experience", "Enterprise Services"] }
+      - description: { type: string }
+    business_role: >
+      Cross-departmental failure attribution: which departments own the most negative
+      decisions, which departments have the highest incident-to-action closure rate.
+
+  Team:
+    label: "Team"
+    description: >
+      A sub-unit within a Department. Each team has a primary site and inherits
+      the department's mission. 15 teams exist in the dataset.
+    real_examples:
+      - id: "TEAM-0001"
+        name: "NOC Core Operations"
+        department: "Network Operations"
+        site: "SITE-0003"
+      - id: "TEAM-0005"
+        name: "Revenue Assurance"
+        department: "Finance"
+        site: "SITE-0006"
+    key_properties:
+      - id: { type: string, prefix: "TEAM-" }
+      - name: { type: string }
+      - department_id: { type: string, prefix: "DEPT-", description: "Parent department FK" }
+      - primary_site_id: { type: string, prefix: "SITE-", description: "Primary office location FK" }
+    business_role: >
+      Team-level accountability mapping: which teams have the most overdue corrective
+      actions, which teams are over-concentrated on single sites (risk exposure).
+
+  # ── HUMAN RESOURCES ─────────────────────────────────────
+
+  Employee:
+    label: "Employee"
+    description: >
+      A person employed by Aarohan at any point in the dataset window. 44 employees
+      are present, spanning active, on-leave, and terminated statuses. EMP-0005
+      (Gunbir Parmer) is the Focal Employee — the narrative backbone of the dataset.
+    real_examples:
+      - id: "EMP-0005"
+        full_name: "Gunbir Parmer"
+        current_job_title: "Head of Network Operations"
+        is_focal: true
+        skills: [Java, Python, "Network Engineering", "Linux Administration", BGP, Scrum, Salesforce, Docker]
+        department: "Customer Experience"
+      - id: "EMP-0001"
+        full_name: "Oni Kannan"
+        current_job_title: "Deputy General Manager"
+        department: "Enterprise Services"
+        manager: null
+        description: "Top of management hierarchy, no manager"
+      - id: "EMP-0023"
+        full_name: "Lekha Raj"
+        deciding_emp_for: "DEC-0001 (NSA 5G — negative outcome)"
+    key_properties:
+      - id: { type: string, prefix: "EMP-" }
+      - full_name: { type: string, locale: "en_IN" }
+      - gender: { type: string, allowed_values: [Male, Female, Non-binary] }
+      - date_of_birth: { type: date, constraint: "age 22–58 at as_of_date" }
+      - hire_date: { type: date, constraint: "must be before as_of_date" }
+      - current_job_title: { type: string }
+      - current_department_id: { type: string, prefix: "DEPT-" }
+      - current_team_id: { type: string, prefix: "TEAM-" }
+      - current_manager_id: { type: string, prefix: "EMP-", nullable: true, description: "null for top-of-hierarchy employees" }
+      - employment_status: { type: enum, values: [active, on_leave, terminated] }
+      - primary_site_id: { type: string, prefix: "SITE-" }
+      - is_focal: { type: boolean, description: "true for exactly one employee (EMP-0005)" }
+      - skills: { type: list[string], storage: JSONB, examples: [Python, BGP, MPLS, "5G RAN", Kubernetes, "Revenue Assurance"] }
+    business_role: >
+      Talent risk analysis: identify high-tenure employees carrying multiple P1 incident
+      responsibilities, decision-makers with the highest negative-outcome rate, and
+      skill coverage gaps per department.
+
+  RoleHistory:
+    label: "RoleHistory"
+    description: >
+      A single contiguous career entry for an Employee, from hire_date to as_of_date
+      with no gaps. The chain captures promotions, lateral moves, restructures.
+    real_example:
+      employee: "EMP-0005 (Gunbir Parmer)"
+      entries:
+        - { start: "2018-12-07", end: "2019-07-17", title: "Associate Engineer", reason: "new_hire" }
+        - { start: "2019-07-17", end: "2020-01-15", title: "Product Manager", reason: "promotion" }
+        - { start: "2020-01-15", end: "2023-07-18", title: "HR Business Partner", reason: "restructure" }
+        - { start: "2023-07-18", end: "2024-03-03", title: "Principal Architect", reason: "promotion" }
+        - { start: "2024-03-03", end: null, title: "Head of Network Operations", reason: "promotion" }
+    key_properties:
+      - employee_id: { type: string, prefix: "EMP-" }
+      - start_date: { type: date }
+      - end_date: { type: date, nullable: true, description: "null = current role" }
+      - job_title: { type: string }
+      - team_id: { type: string, prefix: "TEAM-" }
+      - manager_id: { type: string, prefix: "EMP-", nullable: true }
+      - reason: { type: enum, values: [new_hire, promotion, lateral_move, restructure] }
+    business_role: >
+      Career acceleration analysis: which promotion reasons correlate with project
+      success, whether restructure-heavy career paths correlate with higher incident
+      ownership. Identify flight-risk patterns (lateral_move → terminated).
+
+  # ── PROJECT DELIVERY ─────────────────────────────────────
+
+  Project:
+    label: "Project"
+    description: >
+      A strategic or operational initiative. 10 projects in the dataset ranging from
+      5G infrastructure rollout to AI-driven optimisation. Status distribution:
+      2 completed, 3 on-hold, 1 cancelled, 4 active.
+    real_examples:
+      - id: "PROJ-0001"
+        name: "5G Core Network Upgrade — Phase 2"
+        status: "on-hold"
+        causal_decision: "DEC-0001 (NSA architecture failure)"
+        lesson: "TCO model must include hidden integration costs"
+      - id: "PROJ-0002"
+        name: "Optical Transport Layer Expansion — Bengaluru-Mumbai Corridor"
+        status: "completed"
+        causal_incident: "INC-0003 (capacity breach)"
+        outcome: "800G commissioned, SLA compliance 99.98%"
+      - id: "PROJ-0006"
+        name: "AI-Driven Network Optimisation — FY24"
+        status: "completed"
+        duration: "Jul 2021 → Dec 2022"
+    key_properties:
+      - id: { type: string, prefix: "PROJ-" }
+      - name: { type: string }
+      - description: { type: string }
+      - sponsoring_department_id: { type: string, prefix: "DEPT-" }
+      - lead_emp_id: { type: string, prefix: "EMP-" }
+      - team_emp_ids: { type: list[string], min_items: 3, storage: JSONB }
+      - start_date: { type: date }
+      - planned_end_date: { type: date }
+      - actual_end_date: { type: date, nullable: true }
+      - status: { type: enum, values: [active, completed, cancelled, "on-hold"] }
+      - outcome_summary: { type: string, min_length: 50 }
+      - causal_incident_id: { type: string, prefix: "INC-", nullable: true }
+      - causal_decision_id: { type: string, prefix: "DEC-", nullable: true }
+    business_role: >
+      Portfolio health dashboard: on-hold rate, average milestone delay, decision-caused
+      vs incident-caused blockages, delivery lead vs planned ratio.
+
+  Milestone:
+    label: "Milestone"
+    description: >
+      A time-boxed delivery checkpoint within a Project. Status transitions from
+      pending → in-progress → completed or delayed.
+    real_examples:
+      - project: "PROJ-0001"
+        name: "Core Network Lab Validation"
+        target: "2023-10-31"
+        actual: "2023-11-28"
+        status: "delayed"
+        delay_days: 28
+      - project: "PROJ-0002"
+        name: "Emergency Capacity Upgrade (Corrective Action)"
+        target: "2023-09-07"
+        actual: "2023-09-15"
+        status: "completed"
+        delay_days: 8
+    key_properties:
+      - project_id: { type: string, prefix: "PROJ-" }
+      - name: { type: string }
+      - target_date: { type: date }
+      - actual_completion_date: { type: date, nullable: true }
+      - status: { type: enum, values: [pending, "in-progress", completed, delayed] }
+    derived_properties:
+      - delay_days: "actual_completion_date - target_date (positive = late, negative = early)"
+      - is_blocked: "status in [delayed, pending] AND target_date < as_of_date"
+    business_role: >
+      Schedule performance index: which project phases are chronic bottlenecks,
+      whether delayed milestones cluster in specific vendors, teams, or decision types.
+
+  LessonLearned:
+    label: "LessonLearned"
+    description: >
+      A structured retrospective finding attached to completed or cancelled projects.
+      Links back to the causal incident or decision that produced the failure.
+    real_examples:
+      - id: "LL-0001"
+        project: "PROJ-0001 (5G Phase 2 on-hold)"
+        lesson: "TCO model must include hidden integration costs; cross-functional review mandatory for CapEx >₹2 crore"
+        causal_decision: "DEC-0001"
+      - id: "LL-0002"
+        project: "PROJ-0002 (Optical Transport completed)"
+        lesson: "Capacity models must include 3x traffic sensitivity analysis; NOC sign-off required before IoT go-live"
+        causal_incident: "INC-0003"
+      - id: "LL-0003"
+        project: "PROJ-0006 (AI Optimisation completed)"
+        lesson: "Architectural decisions with cross-circle impact must have two independent domain architects"
+    key_properties:
+      - id: { type: string, prefix: "LL-" }
+      - project_id: { type: string, prefix: "PROJ-" }
+      - description: { type: string }
+      - causal_incident_id: { type: string, prefix: "INC-", nullable: true }
+      - causal_decision_id: { type: string, prefix: "DEC-", nullable: true }
+    business_role: >
+      Organisational learning graph: cluster similar lessons across projects to detect
+      systemic process failures that repeat across years and teams.
+
+  # ── DECISIONS ────────────────────────────────────────────
+
+  Decision:
+    label: "Decision"
+    description: >
+      A ratified choice made by an employee or leadership body. 46 decisions covering
+      technical, operational, strategic, and financial domains. Outcome distribution
+      (from dataset): ~30% negative, ~40% positive, ~30% neutral.
+    real_examples:
+      - id: "DEC-0001"
+        title: "Adopt NSA 5G Architecture for Phase 2 Core Network Rollout"
+        type: "technical"
+        outcome: "negative"
+        deciding_emp: "EMP-0023 (Lekha Raj)"
+        rca_summary: "Cost model excluded hidden integration costs; no cross-functional review; rushed to deadline"
+        impact: "PROJ-0001 placed on hold, 3 milestones delayed"
+      - id: "DEC-0005"
+        title: "Refinance Existing Debt Facilities at Lower Coupon"
+        type: "financial"
+        outcome: "positive"
+        deciding_emp: "EMP-0006 (Caleb Sharaf)"
+      - id: "DEC-0009"
+        title: "Decommission Legacy PCRF Infrastructure"
+        type: "technical"
+        outcome: "positive"
+        deciding_emp: "EMP-0019"
+    key_properties:
+      - id: { type: string, prefix: "DEC-" }
+      - title: { type: string }
+      - description: { type: string }
+      - decision_date: { type: date, constraint: "within [earliest_project_start, as_of_date]" }
+      - decision_type: { type: enum, values: [technical, operational, strategic, financial] }
+      - outcome: { type: enum, values: [positive, neutral, negative] }
+      - rationale: { type: string, min_length: 80 }
+      - alternatives_considered: { type: list[string], min_items: 2, max_items: 5, storage: JSONB }
+      - deciding_emp_id: { type: string, prefix: "EMP-" }
+      - project_id: { type: string, prefix: "PROJ-", nullable: true }
+      - root_cause_analysis: { type: string, nullable: true, min_length: 80, max_length: 1000, description: "Present only for negative outcomes" }
+    derived_properties:
+      - has_rca: "root_cause_analysis IS NOT NULL"
+      - failure_risk_score: "outcome=negative AND project_id IS NOT NULL → high risk"
+    business_role: >
+      Decision quality intelligence: identify decision-makers with highest negative-outcome
+      rate, detect recurring failure patterns in RCA texts (rushed deadlines, missing
+      cross-functional review, hidden costs), map which decision types correlate with
+      project delays.
+
+  # ── INCIDENTS ────────────────────────────────────────────
+
+  Incident:
+    label: "Incident"
+    description: >
+      An operational event causing service disruption, security risk, or financial
+      loss. 18 incidents in the dataset: 2 P1, 7 P2, 5 P3, 4 P4. Types span
+      outages, config errors, billing discrepancies, security near-misses,
+      performance degradations.
+    real_examples:
+      - id: "INC-0001"
+        title: "P1 Core Network Outage — Mumbai Metro Circle"
+        severity: "P1"
+        type: "outage"
+        duration: "5h38m"
+        impact: "380,000 subscribers, complete service blackout"
+        initial_cause: "BGP route flap / ECMP misconfiguration"
+        confirmed_cause: "Juniper MX480 firmware defect (21.4R3-S2) — MPLS label stack corruption"
+        mis_diagnosis: true
+      - id: "INC-0003"
+        title: "P2 Performance Degradation — Enterprise MPLS Circuits Nationwide"
+        severity: "P2"
+        type: "performance_degradation"
+        impact: "47 enterprise customers SLA breach, 14 circles"
+        confirmed_cause: "Capacity breach: IoT platform traffic grew 340% beyond projections"
+        project_impact: "Unblocked PROJ-0002 after corrective action ACT-0005"
+      - id: "INC-0013"
+        title: "Revenue Leakage Detected in Prepaid Top-Up Process"
+        severity: "P2"
+        type: "billing_discrepancy"
+        confirmed_cause: "Malformed GTP-C records from upgraded GGSN software version"
+    key_properties:
+      - id: { type: string, prefix: "INC-" }
+      - title: { type: string, min_length: 10, max_length: 100 }
+      - description: { type: string, min_length: 50, max_length: 500 }
+      - incident_type: { type: enum, values: [outage, config_error, billing_discrepancy, security_near_miss, performance_degradation] }
+      - severity: { type: enum, values: [P1, P2, P3, P4], ordering: "P1 most severe" }
+      - start_datetime: { type: datetime, timezone: UTC }
+      - resolution_datetime: { type: datetime, nullable: true, timezone: UTC, constraint: "must be > start_datetime" }
+      - affected_services: { type: list[string], prefix: "SVC-", storage: JSONB }
+      - affected_sites: { type: list[string], prefix: "SITE-", storage: JSONB }
+      - initial_suspected_cause: { type: string, min_length: 10, max_length: 200 }
+      - confirmed_cause: { type: string, nullable: true, min_length: 10, max_length: 200 }
+      - cause_status: { type: enum, values: [suspected, confirmed] }
+      - cause_revision_note: { type: string, nullable: true, description: "Explains why initial diagnosis was wrong" }
+      - project_id: { type: string, prefix: "PROJ-", nullable: true }
+    derived_properties:
+      - duration_minutes: "resolution_datetime - start_datetime in minutes"
+      - is_mis_diagnosed: "confirmed_cause != initial_suspected_cause AND cause_status = confirmed"
+      - is_recurrence: "EXISTS FollowUpAction WHERE recurrence_incident_id = this.id"
+      - mttr: "mean time to resolve (minutes)"
+    business_role: >
+      Operational risk intelligence: MTTR trends by incident type and severity,
+      mis-diagnosis rate by site and team, recurrence chains from ineffective actions,
+      security near-miss clustering by site.
+
+  # ── CORRECTIVE ACTIONS ───────────────────────────────────
+
+  FollowUpAction:
+    label: "FollowUpAction"
+    description: >
+      A task raised to remediate a specific gap identified in a post-incident or
+      post-decision review. 70 actions in the dataset. Key effectiveness labels:
+      prevented_recurrence (most valuable), partially_effective, ineffective (highest risk),
+      not_yet_assessed.
+    real_examples:
+      - id: "ACT-0001"
+        title: "Apply ECMP Policy Rollback Across All MX480 Chassis"
+        source: "INC-0001 (P1 outage)"
+        status: "completed"
+        effectiveness: "ineffective"
+        recurrence: "INC-0002 (P2 outage — directly caused by this wrong fix)"
+        lesson: "Wrong root cause → wrong fix → recurrence"
+      - id: "ACT-0005"
+        title: "Emergency Capacity Upgrade — Bengaluru-Mumbai Optical Segment"
+        source: "INC-0003 (P2 performance degradation)"
+        status: "completed"
+        effectiveness: "prevented_recurrence"
+        impact: "Unblocked PROJ-0002, SLA compliance improved to 99.98%"
+      - id: "ACT-0016"
+        title: "Roll back configuration change"
+        source: "INC-0018 (P1 billing_discrepancy)"
+        status: "overdue"
+        effectiveness: "partially_effective"
+        risk: "P1 incident action overdue — recurrence risk high"
+    key_properties:
+      - id: { type: string, prefix: "ACT-" }
+      - title: { type: string, min_length: 10, max_length: 100 }
+      - description: { type: string, min_length: 30, max_length: 300 }
+      - source_type: { type: literal, values: [incident, decision] }
+      - source_id: { type: string, description: "INC- or DEC- ID depending on source_type" }
+      - assigned_emp_id: { type: string, prefix: "EMP-" }
+      - due_date: { type: date }
+      - completion_date: { type: date, nullable: true, constraint: "must be >= due_date when set" }
+      - status: { type: enum, values: [open, "in-progress", completed, overdue] }
+      - effectiveness_label: { type: enum, values: [prevented_recurrence, partially_effective, ineffective, not_yet_assessed] }
+      - recurrence_incident_id: { type: string, prefix: "INC-", nullable: true, description: "Incident that recurred because this action was ineffective" }
+    derived_properties:
+      - days_overdue: "as_of_date - due_date WHERE status = overdue"
+      - recurrence_risk: "effectiveness_label=ineffective AND recurrence_incident_id IS NOT NULL"
+      - action_failure_chain: "source_incident → ineffective_action → recurrence_incident"
+    business_role: >
+      Accountability intelligence: overdue action heat-map by assignee and department,
+      effectiveness score per team, recurrence chains that identify systemic fix failures.
+
+  # ── BUSINESS DOCUMENTS ───────────────────────────────────
+
+  BusinessDocument:
+    label: "BusinessDocument"
+    description: >
+      A formal organisational record. 63 documents across 8 types: PIR, ADR, CAT,
+      project_charter, lessons_learned_report, quarterly_review, rca_report, risk_register.
+    real_examples:
+      - id: "DOC-0001"
+        type: "PIR"
+        title: "Post-Incident Review: P1 Mumbai Outage and P2 Recurrence"
+        status: "superseded"
+        successor: "DOC-0002"
+        references: [INC-0001, INC-0002, ACT-0001]
+        insight: "Superseded PIR — see successor for updated root cause"
+      - id: "DOC-0002"
+        type: "CAT"
+        title: "Corrective Action Tracker — NSA Architecture Decision"
+        references: [DEC-0001, PROJ-0001, ACT-0002, ACT-0003, ACT-0004]
+        insight: "Links failed decision to 3 open corrective actions"
+      - id: "DOC-0022"
+        type: "ADR"
+        title: "Architecture Decision Record — Refinance Existing Debt Facilities"
+        references: [DEC-0005, PROJ-0002]
+    key_properties:
+      - id: { type: string, prefix: "DOC-" }
+      - title: { type: string }
+      - document_type: { type: enum, values: [project_charter, PIR, ADR, CAT, lessons_learned_report, quarterly_review, rca_report, risk_register] }
+      - body: { type: string, min_length: 200 }
+      - creation_date: { type: date, constraint: "must be >= min(creation_date of referenced entities)" }
+      - author_emp_id: { type: string, prefix: "EMP-" }
+      - status: { type: enum, values: [draft, approved, superseded] }
+      - referenced_entity_ids: { type: list[string], min_items: 1, storage: JSONB, description: "Any mix of INC-, DEC-, PROJ-, ACT-, EMP- IDs" }
+      - successor_doc_id: { type: string, prefix: "DOC-", nullable: true, description: "Non-null only when status=superseded" }
+    business_role: >
+      Knowledge management graph: find orphaned incidents with no PIR, decisions with
+      no ADR, trace document revision chains, identify prolific authors and knowledge
+      concentration risk.
+
+  # ── SERVICE & INFRASTRUCTURE ─────────────────────────────
+
+  ServiceType:
+    label: "ServiceType"
+    description: >
+      A telecom service offered by Aarohan that can be affected by incidents.
+      SVC-0001 through SVC-0008 in the dataset, matching the 8 service types
+      defined in CompanyProfile (Mobile Broadband, FTTH, Enterprise Leased Lines,
+      Cloud Managed Services, IPLC, IoT Connectivity, VoIP, SD-WAN).
+    real_examples:
+      - id: "SVC-0001"
+        name: "Mobile Broadband (4G/5G)"
+        affected_by: [INC-0001, INC-0002, INC-0006, INC-0007, INC-0013]
+      - id: "SVC-0003"
+        name: "Enterprise Leased Lines"
+        affected_by: [INC-0003, INC-0009, INC-0012, INC-0018]
+    key_properties:
+      - id: { type: string, prefix: "SVC-" }
+      - name: { type: string }
+    business_role: >
+      Service risk exposure: which services are most frequently impacted, co-occurrence
+      matrix of multi-service incidents, SLA breach correlation per service.
+
+
+# ============================================================
+# SECTION 2: RELATIONSHIP TYPES (Graph Edges)
+# ============================================================
+
+relationships:
+
+  # ── ORGANIZATIONAL HIERARCHY ─────────────────────────────
+
+  MANAGES:
+    from: Employee
+    to: Employee
+    description: "Direct managerial relationship (current)"
+    cardinality: "many-to-one (many employees, one manager)"
+    real_example: "EMP-0002 (Abeer Dutta) → MANAGES → EMP-0001 (Oni Kannan)"
+    properties:
+      - effective_from: { type: date, description: "When this management relationship became current" }
+    query_patterns:
+      - "Find employees whose manager has the highest negative-decision rate"
+      - "Detect management chains where a P1 incident owner reports 3+ levels deep"
+    business_value: >
+      Management influence on operational quality: does negative decision-making cascade
+      down reporting lines? Are high-incident teams clustered under specific managers?
+
+  MEMBER_OF_TEAM:
+    from: Employee
+    to: Team
+    description: "Current team membership"
+    real_example: "EMP-0005 → MEMBER_OF_TEAM → TEAM-0007 (Customer Experience)"
+
+  BELONGS_TO_DEPARTMENT:
+    from: Team
+    to: Department
+    description: "Team's parent department"
+    real_example: "TEAM-0007 → BELONGS_TO_DEPARTMENT → DEPT-0004 (Customer Experience)"
+
+  LOCATED_AT:
+    from: Team
+    to: SiteLocation
+    description: "Primary office site for the team"
+    real_example: "TEAM-0001 → LOCATED_AT → SITE-0003 (Bengaluru)"
+
+  WORKS_FROM:
+    from: Employee
+    to: SiteLocation
+    description: "Employee's primary site"
+    real_example: "EMP-0005 → WORKS_FROM → SITE-0006 (Pune)"
+
+  HAD_ROLE:
+    from: Employee
+    to: RoleHistory
+    description: "Career history entry — one per role period"
+    cardinality: "one-to-many (2–10 per employee)"
+    properties:
+      - reason: { type: enum, values: [new_hire, promotion, lateral_move, restructure] }
+    business_value: "Career trajectory analysis; promotion velocity per department"
+
+  # ── PROJECT RELATIONSHIPS ─────────────────────────────────
+
+  LEADS:
+    from: Employee
+    to: Project
+    description: "Employee is the project lead (accountable owner)"
+    real_example: "EMP-0034 → LEADS → PROJ-0002 (Optical Transport)"
+
+  CONTRIBUTES_TO:
+    from: Employee
+    to: Project
+    description: "Employee is a team member on the project"
+    real_example: "EMP-0005 → CONTRIBUTES_TO → PROJ-0001, PROJ-0002, PROJ-0003, PROJ-0004"
+
+  SPONSORED_BY:
+    from: Project
+    to: Department
+    description: "Department funding and owning the project"
+    real_example: "PROJ-0001 → SPONSORED_BY → DEPT-0001 (HR)"
+
+  HAS_MILESTONE:
+    from: Project
+    to: Milestone
+    description: "Project delivery checkpoint"
+    cardinality: "one-to-many (3–7 per project)"
+
+  HAS_LESSON:
+    from: Project
+    to: LessonLearned
+    description: "Retrospective finding from the project"
+    cardinality: "one-to-many (0–N; at least 1 for completed/cancelled)"
+
+  BLOCKED_BY_INCIDENT:
+    from: Project
+    to: Incident
+    description: "Incident that caused the project to go on-hold or be cancelled"
+    real_example: "PROJ-0002 → BLOCKED_BY_INCIDENT → INC-0003 (optical capacity breach)"
+
+  BLOCKED_BY_DECISION:
+    from: Project
+    to: Decision
+    description: "Decision whose negative outcome placed the project on-hold"
+    real_example: "PROJ-0001 → BLOCKED_BY_DECISION → DEC-0001 (NSA architecture failure)"
+
+  # ── DECISION RELATIONSHIPS ───────────────────────────────
+
+  MADE_BY:
+    from: Decision
+    to: Employee
+    description: "Employee who ratified the decision"
+    real_example: "DEC-0001 → MADE_BY → EMP-0023 (Lekha Raj)"
+
+  LINKED_TO_PROJECT:
+    from: Decision
+    to: Project
+    description: "Decision was made in the context of this project"
+    real_example: "DEC-0001 → LINKED_TO_PROJECT → PROJ-0001"
+
+  # ── INCIDENT RELATIONSHIPS ───────────────────────────────
+
+  AFFECTS_SERVICE:
+    from: Incident
+    to: ServiceType
+    description: "Service impacted by the incident"
+    real_example: "INC-0001 → AFFECTS_SERVICE → SVC-0001 (Mobile Broadband), SVC-0002 (FTTH)"
+    business_value: "Service availability heat-map per incident type and severity"
+
+  AFFECTS_SITE:
+    from: Incident
+    to: SiteLocation
+    description: "Physical site experiencing the incident impact"
+    real_example: "INC-0001 → AFFECTS_SITE → SITE-0001 (Mumbai)"
+
+  LINKED_TO_PROJECT:
+    from: Incident
+    to: Project
+    description: "Incident linked to an active or completed project"
+    real_example: "INC-0003 → LINKED_TO_PROJECT → PROJ-0002 (optical transport)"
+
+  CAUSED_RECURRENCE:
+    from: Incident
+    to: Incident
+    description: >
+      An ineffective corrective action on the source incident allowed the target
+      incident to recur. This is the mis-diagnosis chain edge.
+    real_example: >
+      INC-0001 → CAUSED_RECURRENCE → INC-0002
+      (ECMP rollback was wrong fix → Juniper firmware defect persisted → P2 recurrence)
+    properties:
+      - via_action_id: { type: string, prefix: "ACT-", description: "The ineffective action that failed to prevent this" }
+    business_value: >
+      Recurrence chain detection: how many P1/P2 incidents are connected through
+      ineffective-action chains? What is the total subscriber-hours lost due to
+      mis-diagnoses?
+
+  # ── CORRECTIVE ACTION RELATIONSHIPS ─────────────────────
+
+  RAISED_FROM_INCIDENT:
+    from: FollowUpAction
+    to: Incident
+    description: "Action was raised as a result of post-incident review"
+    real_example: "ACT-0001 → RAISED_FROM_INCIDENT → INC-0001"
+
+  RAISED_FROM_DECISION:
+    from: FollowUpAction
+    to: Decision
+    description: "Action was raised following a negative decision outcome"
+    real_example: "ACT-0002 → RAISED_FROM_DECISION → DEC-0001"
+
+  ASSIGNED_TO:
+    from: FollowUpAction
+    to: Employee
+    description: "Employee accountable for completing the action"
+    real_example: "ACT-0005 → ASSIGNED_TO → EMP-0014"
+
+  PREVENTED_RECURRENCE_OF:
+    from: FollowUpAction
+    to: Incident
+    description: "Action with effectiveness=prevented_recurrence for the source incident"
+    real_example: "ACT-0005 → PREVENTED_RECURRENCE_OF → INC-0003"
+    business_value: "ROI of corrective actions: which actions actually broke the recurrence chain"
+
+  # ── DOCUMENT RELATIONSHIPS ───────────────────────────────
+
+  DOCUMENTS:
+    from: BusinessDocument
+    to: any_entity
+    description: "Document references any entity type"
+    real_example: "DOC-0001 → DOCUMENTS → INC-0001, INC-0002, ACT-0001"
+
+  AUTHORED_BY:
+    from: BusinessDocument
+    to: Employee
+    description: "Employee who wrote or owns the document"
+    real_example: "DOC-0001 → AUTHORED_BY → EMP-0022 (Nathaniel Sami)"
+
+  SUPERSEDED_BY:
+    from: BusinessDocument
+    to: BusinessDocument
+    description: "This document was replaced by the target document"
+    real_example: "DOC-0001 → SUPERSEDED_BY → DOC-0002"
+
+  LESSON_CAUSED_BY_INCIDENT:
+    from: LessonLearned
+    to: Incident
+    description: "Lesson traces back to a specific incident"
+    real_example: "LL-0002 → LESSON_CAUSED_BY_INCIDENT → INC-0003"
+
+  LESSON_CAUSED_BY_DECISION:
+    from: LessonLearned
+    to: Decision
+    description: "Lesson traces back to a specific decision"
+    real_example: "LL-0001 → LESSON_CAUSED_BY_DECISION → DEC-0001"
+
+
+# ============================================================
+# SECTION 3: INFERENCE RULES & DERIVED RELATIONSHIPS
+# ============================================================
+# These are computed edges / virtual triples the graph engine
+# should materialise or evaluate at query time.
+
+inference_rules:
+
+  R01_decision_failure_propagation:
+    name: "Decision Failure Propagates to Project"
+    logic: >
+      IF Decision.outcome = 'negative'
+      AND Decision.project_id IS NOT NULL
+      THEN Project.status IN ['on-hold', 'cancelled']
+         OR EXISTS Milestone WHERE status = 'delayed'
+    real_instance: "DEC-0001 (negative) → PROJ-0001 (on-hold, 3 milestones delayed)"
+    business_question: "Which projects are structurally at risk because a key decision was already negative?"
+
+  R02_mis_diagnosis_recurrence_chain:
+    name: "Incident Recurrence Through Ineffective Action"
+    logic: >
+      IF FollowUpAction.effectiveness_label = 'ineffective'
+      AND FollowUpAction.recurrence_incident_id IS NOT NULL
+      THEN INFER recurrence_risk_edge(
+        source_incident → recurrence_incident,
+        via = action_id
+      )
+    real_instance: "INC-0001 → ACT-0001 (ineffective ECMP rollback) → INC-0002 (P2 recurrence)"
+    business_question: "Show the full causal chain: original incident → wrong fix → recurrence → business impact"
+
+  R03_overdue_action_escalation:
+    name: "Overdue Actions on Critical Incidents Need Escalation"
+    logic: >
+      IF FollowUpAction.due_date < as_of_date
+      AND FollowUpAction.status = 'open'
+      THEN set status = 'overdue'
+      IF source incident severity IN ['P1', 'P2']
+      THEN flag for immediate management escalation
+    real_instances:
+      - "ACT-0016 (overdue, from P1 INC-0018 billing discrepancy)"
+      - "ACT-0018 (overdue, from P1 INC-0018)"
+      - "ACT-0020 (overdue, from P1 INC-0018)"
+      - "ACT-0027 (overdue, from P2 INC-0003 performance degradation)"
+    business_question: "Which P1/P2 incidents have open/overdue actions that expose the company to recurrence?"
+
+  R04_knowledge_concentration_risk:
+    name: "Single Employee Owns Too Many Critical Actions"
+    logic: >
+      IF Employee.id appears as assigned_emp_id
+      IN more than 5 FollowUpActions WHERE status IN ['open', 'in-progress', 'overdue']
+      THEN flag as knowledge_concentration_risk
+    business_question: "Which employees are single points of failure in the corrective action pipeline?"
+
+  R05_decision_maker_failure_rate:
+    name: "Decision Maker Risk Score"
+    logic: >
+      FOR each Employee e:
+        negative_rate(e) = COUNT(Decisions WHERE deciding_emp_id = e AND outcome = 'negative')
+                         / COUNT(Decisions WHERE deciding_emp_id = e)
+      IF negative_rate(e) > 0.4 THEN flag as high_failure_rate_decision_maker
+    real_instance: "EMP-0023 (Lekha Raj): decided DEC-0001 (negative, NSA architecture)"
+    business_question: "Which decision-makers have a negative-outcome rate above 40%? Are they still making high-impact decisions?"
+
+  R06_project_rescue_pattern:
+    name: "Corrective Action Rescues Blocked Project"
+    logic: >
+      IF Project.status was 'on-hold' due to incident
+      AND FollowUpAction.effectiveness_label = 'prevented_recurrence'
+      AND FollowUpAction.source_id = incident_that_blocked_project
+      THEN INFER project_rescued_by_action(Project, FollowUpAction)
+    real_instance: "INC-0003 → ACT-0005 (prevented_recurrence) → PROJ-0002 rescued (completed ahead of schedule)"
+    business_question: "What was the business value (SLA improvement, revenue protection) of ACT-0005 rescuing PROJ-0002?"
+
+  R07_lesson_repeat_pattern:
+    name: "Same Lesson Learned Multiple Times"
+    logic: >
+      IF LessonLearned.description similarity > 0.7 across multiple projects
+      THEN flag as repeated_organisational_failure
+    real_instances:
+      - "LL-0001 and LL-0003 both reference missing cross-functional review at Architecture Review Board"
+    business_question: "Which process gaps are being 'learned' repeatedly without being fixed? These are systemic failures."
+
+  R08_site_incident_concentration:
+    name: "Site Risk Concentration"
+    logic: >
+      FOR each SiteLocation s:
+        incident_count(s) = COUNT(Incidents WHERE affected_sites CONTAINS s.id)
+      IF incident_count(s) > average_incident_count * 1.5
+      THEN flag as high_risk_site
+    real_instance: "SITE-0001 (Mumbai): appears in INC-0001, INC-0002, INC-0006, INC-0007, INC-0013, INC-0015 — highest exposure"
+    business_question: "Which sites need priority infrastructure investment to reduce incident concentration?"
+
+  R09_rca_failure_pattern_clustering:
+    name: "RCA Text Pattern Detection"
+    logic: >
+      Extract themes from root_cause_analysis fields using keyword matching:
+        - 'board presentation deadline' | 'rushed' | 'compressed timeline' → "deadline_pressure_failure"
+        - 'cross-functional review' | 'single team' | 'no independent' → "siloed_decision_making"
+        - 'hidden integration costs' | 'financial model excluded' → "cost_model_failure"
+        - 'training' | 'NOC team' | 'operational change burden' → "change_management_failure"
+    real_instances:
+      - "DEC-0001 RCA: deadline pressure + siloed decision + cost model failure (all 3 patterns)"
+      - "DEC-0008 RCA: optimistic projections + single team + deadline pressure"
+      - "DEC-0011, DEC-0018, DEC-0020 RCA: operational change burden + hidden costs"
+    business_question: >
+      Which failure archetype recurs most across all negative decisions? Deadline pressure
+      appears in 60%+ of negative decision RCAs — this is a board-level process issue.
+
+  R10_skill_incident_gap:
+    name: "Team Skill Gap Correlates With Incident Type"
+    logic: >
+      IF Incident.incident_type = 'security_near_miss'
+      AND assigned team employees have avg_skill_coverage for [ZTNA, MFA, IAM] < 2
+      THEN flag as skill_gap_risk
+    real_instance: >
+      7 security_near_miss incidents (INC-0004,0005,0006,0008,0010,0011,0014,0016,0017)
+      — check if NOC team employees have security skills in their profile
+    business_question: "Are incident types clustering in teams with measurable skill gaps in those domains?"
+
+
+# ============================================================
+# SECTION 4: GRAPH TRAVERSAL PATTERNS
+# ============================================================
+# Named graph query patterns for the analytics layer.
+# Expressed in Cypher-like pseudocode for portability.
+
+graph_traversal_patterns:
+
+  P01_full_causal_chain:
+    name: "Full Causal Chain Trace"
+    description: "Trace from a decision or incident through all downstream effects"
+    cypher_pseudocode: |
+      MATCH (d:Decision {outcome: 'negative'})-[:LINKED_TO_PROJECT]->(p:Project)
+            -[:HAS_LESSON]->(ll:LessonLearned)
+            -[:LESSON_CAUSED_BY_DECISION]->(d)
+      OPTIONAL MATCH (p)<-[:BLOCKED_BY_DECISION]-(p)
+      OPTIONAL MATCH (d)<-[:RAISED_FROM_DECISION]-(act:FollowUpAction)
+      RETURN d, p, ll, act ORDER BY d.decision_date
+    real_instance: "DEC-0001 → PROJ-0001 (on-hold) → LL-0001 + ACT-0002/0003/0004"
+    business_value: "One query to surface the full business cost of a bad decision"
+
+  P02_incident_recurrence_graph:
+    name: "Incident Recurrence Chain"
+    description: "All incidents connected through ineffective-action chains"
+    cypher_pseudocode: |
+      MATCH (inc1:Incident)<-[:RAISED_FROM_INCIDENT]-(act:FollowUpAction {effectiveness_label: 'ineffective'})
+      WHERE act.recurrence_incident_id IS NOT NULL
+      MATCH (inc2:Incident {id: act.recurrence_incident_id})
+      RETURN inc1, act, inc2,
+             duration_hours(inc1) + duration_hours(inc2) AS total_downtime_hours
+    real_instance: "INC-0001 ← ACT-0001 (ineffective) → INC-0002: total ~10h of outage"
+    business_value: "Quantify the cost of mis-diagnosis in subscriber-hours and SLA breach penalties"
+
+  P03_employee_risk_profile:
+    name: "High-Risk Employee Profile"
+    description: "Employees with high negative-decision rate AND overdue action ownership"
+    cypher_pseudocode: |
+      MATCH (emp:Employee)
+      OPTIONAL MATCH (emp)<-[:MADE_BY]-(d:Decision {outcome: 'negative'})
+      OPTIONAL MATCH (emp)<-[:ASSIGNED_TO]-(act:FollowUpAction {status: 'overdue'})
+      RETURN emp,
+             COUNT(DISTINCT d) AS negative_decisions,
+             COUNT(DISTINCT act) AS overdue_actions,
+             (negative_decisions * 2 + overdue_actions) AS risk_score
+      ORDER BY risk_score DESC LIMIT 10
+    business_value: "Identify employees who are both decision-quality risks AND accountability risks"
+
+  P04_department_incident_ownership:
+    name: "Department Incident and Action Performance"
+    description: "Which departments generate the most incidents and close the least actions"
+    cypher_pseudocode: |
+      MATCH (dept:Department)<-[:BELONGS_TO_DEPARTMENT]-(team:Team)
+            <-[:MEMBER_OF_TEAM]-(emp:Employee)
+            <-[:ASSIGNED_TO]-(act:FollowUpAction)
+      RETURN dept.name,
+             COUNT(act) AS total_actions,
+             SUM(act.status = 'overdue') AS overdue_count,
+             SUM(act.status = 'completed') AS completed_count,
+             (completed / total) AS closure_rate
+      ORDER BY overdue_count DESC
+    business_value: "Cross-departmental SLA accountability dashboard"
+
+  P05_document_coverage_audit:
+    name: "Document Coverage Audit"
+    description: "P1/P2 incidents with no PIR, negative decisions with no ADR or CAT"
+    cypher_pseudocode: |
+      MATCH (inc:Incident) WHERE inc.severity IN ['P1', 'P2']
+      OPTIONAL MATCH (doc:BusinessDocument {document_type: 'PIR'})-[:DOCUMENTS]->(inc)
+      WHERE doc IS NULL
+      RETURN inc.id, inc.title, inc.severity, 'MISSING PIR' AS gap_type
+      UNION
+      MATCH (d:Decision {outcome: 'negative'})
+      OPTIONAL MATCH (cat:BusinessDocument {document_type: 'CAT'})-[:DOCUMENTS]->(d)
+      WHERE cat IS NULL
+      RETURN d.id, d.title, d.outcome, 'MISSING CAT' AS gap_type
+    business_value: "Compliance gap detection: undocumented incidents and decisions are regulatory risks"
+
+  P06_skill_coverage_map:
+    name: "Team Skill Coverage vs Incident Type"
+    description: "Map team skill profiles against the incident types they face"
+    cypher_pseudocode: |
+      MATCH (team:Team)<-[:MEMBER_OF_TEAM]-(emp:Employee)
+      MATCH (inc:Incident)-[:AFFECTS_SITE]->(site:SiteLocation)
+            <-[:LOCATED_AT]-(team)
+      RETURN team.name,
+             COLLECT(DISTINCT emp.skills) AS team_skills,
+             COUNT(inc) AS incidents_at_site,
+             inc.incident_type AS incident_types
+    business_value: "Staffing intelligence: match skill deficits to incident frequency at each site"
+
+  P07_project_portfolio_health:
+    name: "Portfolio Health Scorecard"
+    description: "Summarise all projects by status, blocking cause, and milestone health"
+    cypher_pseudocode: |
+      MATCH (p:Project)
+      OPTIONAL MATCH (p)-[:HAS_MILESTONE]->(m:Milestone)
+      OPTIONAL MATCH (p)-[:BLOCKED_BY_DECISION]->(d:Decision)
+      OPTIONAL MATCH (p)-[:BLOCKED_BY_INCIDENT]->(i:Incident)
+      RETURN p.id, p.name, p.status,
+             COUNT(m) AS total_milestones,
+             SUM(m.status = 'delayed') AS delayed_milestones,
+             d.title AS blocking_decision,
+             i.title AS blocking_incident,
+             (p.actual_end_date - p.planned_end_date) AS schedule_variance_days
+      ORDER BY delayed_milestones DESC
+    business_value: "Executive-level portfolio dashboard with causal attribution"
+
+  P08_knowledge_retention_risk:
+    name: "Knowledge Retention Risk"
+    description: "Employees who are authors/owners of critical knowledge with terminated or on-leave status"
+    cypher_pseudocode: |
+      MATCH (emp:Employee) WHERE emp.employment_status IN ['terminated', 'on_leave']
+      OPTIONAL MATCH (doc:BusinessDocument)-[:AUTHORED_BY]->(emp)
+      OPTIONAL MATCH (act:FollowUpAction)-[:ASSIGNED_TO]->(emp)
+            WHERE act.status IN ['open', 'in-progress']
+      RETURN emp.id, emp.full_name, emp.employment_status,
+             COUNT(DISTINCT doc) AS documents_owned,
+             COUNT(DISTINCT act) AS open_actions_assigned
+      ORDER BY (documents_owned + open_actions_assigned * 2) DESC
+    real_instance: >
+      EMP-0009 (Vedant Mann, terminated) and EMP-0031 (Janani Mohanty, terminated)
+      — check for open actions assigned to them
+    business_value: "HR risk: terminated employees with unresolved actions or sole-authored critical documents"
+
+
+# ============================================================
+# SECTION 5: BUSINESS GROWTH PATTERNS
+# ============================================================
+# High-value analytical patterns that directly connect
+# operational knowledge graph data to business outcomes.
+
+business_growth_patterns:
+
+  BG01_network_reliability_index:
+    name: "Network Reliability Improvement Opportunity"
+    description: >
+      The dataset shows 2 P1 and 7 P2 incidents in a 3-year window, with a
+      mis-diagnosis rate of ~30% (confirmed_cause != initial_suspected_cause).
+      Mis-diagnoses extend MTTR by 90–120 minutes per incident on average.
+    data_evidence:
+      - "INC-0001: 90-minute delay due to ECMP mis-diagnosis"
+      - "3+ incidents with cause_revision_note indicating wrong initial attribution"
+    opportunity: >
+      Reducing mis-diagnosis rate from 30% to 10% (industry best practice) would
+      recover approximately 4–6 hours of P1/P2 downtime per year, directly
+      improving enterprise SLA compliance and reducing penalty exposure.
+    recommended_graph_query: "P02 (Incident Recurrence Chain)"
+    kpi: "MTTR reduction (minutes/incident), SLA breach count per quarter"
+
+  BG02_decision_governance_gap:
+    name: "Decision Governance Process Failure"
+    description: >
+      11 of 46 decisions (24%) have negative outcomes. RCA text analysis across
+      DEC-0001, DEC-0008, DEC-0011, DEC-0018, DEC-0020 reveals 3 recurring root
+      causes: deadline pressure, siloed decision-making, hidden cost models.
+      ALL THREE appear in DEC-0001 which blocked PROJ-0001 (5G Phase 2).
+    data_evidence:
+      - "DEC-0001 RCA: 'rushed to board deadline', 'no independent vendor-neutral analysis', 'hidden integration costs'"
+      - "DEC-0008 RCA: 'compressed timeline', 'single team without cross-functional review'"
+      - "DEC-0011 RCA: 'hidden integration costs added 34% to approved budget'"
+    opportunity: >
+      Implementing a mandatory 2-week independent review gate for all decisions
+      above ₹2 crore CapEx (as recommended in ACT-0004) would address 80% of
+      the documented failure modes. This directly reduces the 24% negative-decision
+      rate and protects project portfolios from avoidable on-hold events.
+    recommended_graph_query: "R09 (RCA Pattern Clustering)"
+    kpi: "Negative decision rate (target: <10%), project on-hold rate"
+
+  BG03_corrective_action_roi:
+    name: "Corrective Action ROI Measurement"
+    description: >
+      ACT-0005 (emergency capacity upgrade, INC-0003) was labelled prevented_recurrence
+      and directly enabled PROJ-0002 to complete 3.5 months ahead of schedule.
+      The Bengaluru-Mumbai corridor now operates at 99.98% enterprise SLA compliance.
+      This is the highest-ROI corrective action in the dataset.
+    data_evidence:
+      - "ACT-0005: completed 2023-09-15, effectiveness=prevented_recurrence"
+      - "PROJ-0002: completed 2024-09-15, outcome: 800G capacity, 99.98% SLA"
+      - "INC-0003: 47 enterprise customers SLA breach → 0 after ACT-0005"
+    opportunity: >
+      Formalise a 'corrective action ROI framework': track the business value unlocked
+      by prevented_recurrence actions (SLA savings, project enablement, revenue protection)
+      to build the business case for faster action resolution and better root cause analysis.
+    recommended_graph_query: "R06 (Project Rescue Pattern), P02 (Recurrence Chain)"
+    kpi: "prevented_recurrence action count, project rescue events, SLA breach delta"
+
+  BG04_talent_risk_concentration:
+    name: "Talent Risk: Over-Concentration on Key Individuals"
+    description: >
+      EMP-0005 (Gunbir Parmer, Focal Employee) appears across 4+ projects, contributes
+      to multiple P1 incident response chains, and is in Head of Network Operations role.
+      Several terminated/on-leave employees still have open actions assigned to them.
+    data_evidence:
+      - "EMP-0005: CONTRIBUTES_TO PROJ-0001, PROJ-0002, PROJ-0003, PROJ-0004"
+      - "EMP-0009 (terminated): check for open ACT assignments"
+      - "EMP-0031 (terminated): check for open ACT assignments"
+    opportunity: >
+      Build a knowledge distribution index from the graph: measure the Gini coefficient
+      of document authorship, action ownership, and project contribution. Flag roles
+      where a single departure would disrupt 3+ active workstreams.
+    recommended_graph_query: "P08 (Knowledge Retention Risk), R04 (Concentration Risk)"
+    kpi: "Knowledge Gini coefficient per department, open actions on departed employees"
+
+  BG05_security_posture_trend:
+    name: "Security Posture Degradation Signal"
+    description: >
+      9 of 18 incidents (50%) are security_near_miss type. INC-0004, 0005, 0006, 0008,
+      0010, 0011, 0014, 0016, 0017 all involve NOC management network, CI/CD, API gateway,
+      or credential compromise. Only INC-0006, 0008, 0010 have confirmed causes — meaning
+      ~67% of security incidents still have suspected (uninvestigated) root causes.
+    data_evidence:
+      - "INC-0004: Unauthorised access, suspected API misconfiguration, cause=suspected"
+      - "INC-0014: Unauthorised access, P2, cause=suspected, no resolution_datetime"
+      - "INC-0016: Unauthorised access, P3, cause=suspected, unresolved"
+    opportunity: >
+      Security near-misses with unconfirmed causes represent potential undetected breaches.
+      Mandate a 30-day forensic investigation SLA for all security_near_miss incidents.
+      The graph can automatically flag all security incidents where cause_status=suspected
+      AND (resolution_datetime IS NULL OR created > 30 days ago) for immediate security review.
+    recommended_graph_query: "R08 (Site Concentration), custom: security incident audit"
+    kpi: "Security incident confirmation rate (target: 100%), unresolved security incidents"
+
+  BG06_5g_programme_recovery:
+    name: "5G Programme Recovery Roadmap"
+    description: >
+      PROJ-0001 (5G Core Phase 2) is on-hold due to DEC-0001. ACT-0002, 0003, 0004
+      are all in-progress with due dates in H2 2024. PROJ-0010 (5G Phase 1) was
+      cancelled. This means Aarohan's 5G rollout is 2-3 years behind plan.
+    data_evidence:
+      - "PROJ-0001: on-hold since 2024, causal_decision=DEC-0001"
+      - "ACT-0002: architecture review, due 2024-06-30, in-progress"
+      - "ACT-0003: revised CapEx model, due 2024-08-30, in-progress"
+      - "ACT-0004: cross-functional review gate, due 2024-10-30, in-progress"
+      - "PROJ-0010: 5G Phase 1 cancelled 2022-01-06"
+    opportunity: >
+      Once ACT-0002/0003/0004 close, a new technical decision for 5G Phase 2
+      architecture can be made — this time with the mandatory review gate in place.
+      The knowledge graph can model this dependency chain and alert when all three
+      blocking actions are resolved, automatically triggering the go/no-go assessment
+      for PROJ-0001 resumption.
+    recommended_graph_query: "P01 (Causal Chain Trace), P07 (Portfolio Health)"
+    kpi: "5G Phase 2 resumption date, market share impact per quarter of delay"
+
+  BG07_enterprise_sla_protection:
+    name: "Enterprise Customer SLA Protection"
+    description: >
+      INC-0003 breached SLA for 47 enterprise customers. INC-0013 was a P2 billing
+      discrepancy on prepaid top-up. INC-0018 was a P1 billing discrepancy with
+      5 overdue corrective actions. Enterprise revenue is directly at risk.
+    data_evidence:
+      - "INC-0003: 47 enterprise customers, MPLS SLA breach, nationwide"
+      - "INC-0018: P1 billing_discrepancy, ACT-0016/0018/0020/0023 overdue"
+      - "PROJ-0009: Revenue Assurance Transformation Phase 2 — active, addresses root cause"
+    opportunity: >
+      Correlate enterprise SLA breach incidents with the Revenue Assurance project
+      (PROJ-0009) delivery timeline. Use the knowledge graph to surface: if PROJ-0009
+      delivers its Phase 2 milestones, which incident types would have been preventable?
+      Build a revenue-at-risk model from incident frequency × enterprise customer count.
+    recommended_graph_query: "P04 (Department Accountability), R03 (Overdue Escalation)"
+    kpi: "Enterprise SLA compliance %, revenue leakage per billing discrepancy incident"
+
+
+# ============================================================
+# SECTION 6: PROPERTY CONSTRAINTS & VALIDATION RULES
+# ============================================================
+
+validation_rules:
+
+  VR01_id_uniqueness:
+    description: "All entity IDs must be unique within their prefix namespace"
+    rule: "FOREACH prefix IN [EMP,TEAM,PROJ,DEC,INC,ACT,DOC,SITE,SVC,DEPT]: COUNT(id) = COUNT(DISTINCT id)"
+    enforced_by: "IDRegistry.assert_unique()"
+
+  VR02_hire_date_before_as_of:
+    description: "No employee hired on or after the as_of_date"
+    rule: "Employee.hire_date < as_of_date"
+    violation_action: "Raise ValidationError, exit 1"
+
+  VR03_role_history_contiguity:
+    description: "Role history must be contiguous from hire_date to as_of_date"
+    rule: |
+      entries[0].start_date = hire_date
+      entries[-1].end_date = null
+      FOR i in range(len(entries)-1): entries[i].end_date = entries[i+1].start_date
+
+  VR04_incident_resolution_ordering:
+    description: "Resolution must strictly follow start"
+    rule: "Incident.resolution_datetime > Incident.start_datetime WHERE resolution_datetime IS NOT NULL"
+
+  VR05_confirmed_cause_completeness:
+    description: "Confirmed incidents must have a non-empty confirmed_cause"
+    rule: "Incident.cause_status = 'confirmed' IMPLIES len(confirmed_cause) >= 10"
+
+  VR06_project_date_ordering:
+    description: "Actual end date must be after start date and within 365 days of planned end"
+    rule: |
+      Project.actual_end_date > Project.start_date
+      Project.actual_end_date <= Project.planned_end_date + 365 days
+      WHERE actual_end_date IS NOT NULL
+
+  VR07_pir_coverage:
+    description: "Every P1/P2 incident must have at least one PIR document referencing its INC- ID"
+    rule: |
+      FOR inc IN incidents WHERE severity IN [P1, P2]:
+        EXISTS doc IN documents WHERE doc_type = PIR AND inc.id IN doc.referenced_entity_ids
+
+  VR08_action_overdue_status:
+    description: "Past-due open actions must be marked overdue"
+    rule: "action.due_date < as_of_date AND action.status = 'open' IS FORBIDDEN"
+
+  VR09_superseded_document_chain:
+    description: "Superseded documents must have a valid successor"
+    rule: "document.status = 'superseded' IMPLIES document.successor_doc_id IS NOT NULL AND EXISTS doc WHERE id = successor_doc_id"
+
+  VR10_no_manager_cycles:
+    description: "No employee can appear in their own management chain at any depth up to 10"
+    rule: |
+      FOR emp in employees:
+        TRAVERSE manager_chain(emp, depth=10)
+        emp.id MUST NOT appear in visited_set
+
+
+# ============================================================
+# SECTION 7: GRAPH ANALYTICS METRICS
+# ============================================================
+# Pre-defined metrics the graph platform should continuously
+# compute and surface in dashboards.
+
+analytics_metrics:
+
+  centrality:
+    betweenness_centrality:
+      description: "Nodes that bridge the most graph paths — critical connectors"
+      expected_high_centrality_nodes:
+        - "EMP-0005 (Focal Employee — bridges multiple project and incident subgraphs)"
+        - "DEC-0001 (connects PROJ-0001, ACT-0002/0003/0004, EMP-0023)"
+        - "INC-0001 (connects to INC-0002 recurrence chain, ACT-0001, DOC-0001)"
+        - "PROJ-0002 (connects INC-0003, ACT-0005, multiple employees)"
+    pagerank:
+      description: "Most referenced nodes — highest knowledge authority"
+      expected_high_pagerank:
+        - "INC-0001 (referenced by PIR DOC-0001, DOC-0014, ACT-0001 through ACT-0015)"
+        - "DEC-0001 (referenced by PROJ-0001, ACT-0002/0003/0004, DOC-0002, LL-0001)"
+        - "EMP-0005 (appears in 4+ projects, focal employee)"
+
+  community_detection:
+    description: "Cluster entities into operational communities"
+    expected_clusters:
+      - name: "5G Programme Cluster"
+        nodes: [PROJ-0001, PROJ-0010, DEC-0001, ACT-0002, ACT-0003, ACT-0004, EMP-0023, LL-0001, DOC-0002]
+        insight: "Entire 5G programme blocked by a single architecture decision — high business risk cluster"
+      - name: "Mumbai Outage Cluster"
+        nodes: [INC-0001, INC-0002, ACT-0001, DOC-0001, DOC-0014, EMP-0020, EMP-0022]
+        insight: "Recurrence chain: firmware defect + wrong fix + P2 repeat — contained but unresolved"
+      - name: "Optical Transport Success Cluster"
+        nodes: [INC-0003, ACT-0005, ACT-0006, ACT-0007, PROJ-0002, LL-0002, DOC-0016]
+        insight: "Best-practice cluster: incident → effective corrective action → project recovery"
+      - name: "Security Near-Miss Cluster"
+        nodes: [INC-0004, INC-0005, INC-0006, INC-0008, INC-0010, INC-0011, INC-0014, INC-0016]
+        insight: "9 security incidents, 6 with unconfirmed cause — potential hidden breach risk"
+
+  path_analysis:
+    shortest_path_queries:
+      - "EMP-0005 → INC-0001 (how many hops is the focal employee from the P1 outage?)"
+      - "DEC-0001 → current as_of_date status of PROJ-0001 blocking actions"
+      - "INC-0003 → PROJ-0002 completion (the rescue path)"
+
+  temporal_analysis:
+    incident_trend:
+      description: "Incident frequency by month and type over the 3-year dataset window"
+      security_trend: "Security near-misses appear to increase in 2023–2024 period"
+      billing_trend: "2 billing discrepancies (INC-0013, INC-0018) — both P1/P2 — in 2023"
+    decision_quality_trend:
+      description: "Negative decision rate by year — is governance improving?"
+      note: "Dataset spans 2021–2024; temporal clustering of negative decisions can reveal governance degradation periods"
+
+
+# ============================================================
+# SECTION 8: GRAPH PLATFORM IMPLEMENTATION NOTES
+# ============================================================
+
+implementation_notes:
+
+  storage:
+    recommended_platforms:
+      - name: "Neo4j"
+        reason: "Native property graph, Cypher query language, built-in graph algorithms library (GDS)"
+        import: "Use LOAD CSV with the JSON records, map IDs to node labels per this ontology"
+      - name: "Amazon Neptune"
+        reason: "Managed graph DB, supports Gremlin and SPARQL, integrates with AWS analytics stack"
+      - name: "Stardog"
+        reason: "Enterprise knowledge graph with OWL reasoning, can apply inference rules natively"
+
+  node_label_mapping:
+    Employee: ":Employee"
+    Project: ":Project"
+    Decision: ":Decision"
+    Incident: ":Incident"
+    FollowUpAction: ":FollowUpAction"
+    BusinessDocument: ":BusinessDocument"
+    Department: ":Department"
+    Team: ":Team"
+    SiteLocation: ":SiteLocation"
+    RoleHistory: ":RoleHistory"
+    LessonLearned: ":LessonLearned"
+    ServiceType: ":ServiceType"
+
+  relationship_label_mapping:
+    manages: "MANAGES"
+    member_of: "MEMBER_OF_TEAM"
+    led_by: "LEADS"
+    linked_to_project: "LINKED_TO_PROJECT"
+    caused_by: "BLOCKED_BY_DECISION or BLOCKED_BY_INCIDENT"
+    followed_by: "CAUSED_RECURRENCE"
+    documented_in: "DOCUMENTS"
+    resolved_by: "PREVENTED_RECURRENCE_OF"
+    superseded_by: "SUPERSEDED_BY"
+
+  jsonb_fields_to_expand:
+    - "Employee.skills → individual :Skill nodes with HAS_SKILL edges"
+    - "Incident.affected_services → individual :ServiceType nodes with AFFECTS_SERVICE edges"
+    - "Incident.affected_sites → individual :SiteLocation nodes with AFFECTS_SITE edges"
+    - "Project.team_emp_ids → individual :Employee nodes with CONTRIBUTES_TO edges"
+    - "BusinessDocument.referenced_entity_ids → edges to resolved entity nodes"
+
+  index_recommendations:
+    - "CREATE INDEX ON :Employee(id)"
+    - "CREATE INDEX ON :Incident(severity)"
+    - "CREATE INDEX ON :Incident(incident_type)"
+    - "CREATE INDEX ON :Decision(outcome)"
+    - "CREATE INDEX ON :FollowUpAction(status)"
+    - "CREATE INDEX ON :FollowUpAction(effectiveness_label)"
+    - "CREATE INDEX ON :Project(status)"
+    - "CREATE FULLTEXT INDEX ON :Decision(root_cause_analysis, rationale)"
+    - "CREATE FULLTEXT INDEX ON :LessonLearned(description)"
+    - "CREATE FULLTEXT INDEX ON :BusinessDocument(body, title)"

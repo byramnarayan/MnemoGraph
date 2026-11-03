@@ -4,7 +4,7 @@ import React from 'react';
 import { Tag } from '@/kit';
 
 export interface RightDrawerItem {
-  type: 'source' | 'citation';
+  type: 'source' | 'citation' | 'ontology_node' | 'incident' | 'decision' | 'action';
   title: string;
   subtitle?: string;
   score?: number;
@@ -31,7 +31,7 @@ export function RightDrawer({ isOpen, onClose, item }: RightDrawerProps) {
       {/* Header */}
       <div className="h-14 border-b border-border px-5 flex items-center justify-between bg-muted/20">
         <div className="flex items-center gap-2">
-          <Tag tone={item.type === 'source' ? 'neutral' : 'accent'}>
+          <Tag tone={item.type === 'source' ? 'neutral' : item.type === 'decision' ? 'warn' : 'accent'}>
             {item.type.toUpperCase()}
           </Tag>
           <span className="text-xs font-semibold text-foreground truncate max-w-[280px]">
@@ -63,11 +63,32 @@ export function RightDrawer({ isOpen, onClose, item }: RightDrawerProps) {
           )}
         </div>
 
+        {/* Structured Metadata / Ontology Properties */}
+        {item.metadata && Object.keys(item.metadata).length > 0 && (
+          <div className="space-y-1.5">
+            <span className="text-[10px] text-muted-foreground uppercase font-semibold block">
+              Ontology Entity Attributes
+            </span>
+            <div className="p-3 rounded-xs border border-border/70 bg-muted/10 space-y-1.5 text-xs">
+              {Object.entries(item.metadata).map(([k, v]) => (
+                <div key={k} className="flex flex-col sm:flex-row sm:justify-between sm:items-start gap-1 border-b border-border/30 pb-1">
+                  <span className="text-muted-foreground font-medium capitalize text-[11px]">
+                    {k.replace(/_/g, ' ')}:
+                  </span>
+                  <span className="text-foreground text-left sm:text-right font-medium max-w-[260px] break-words text-[11px]">
+                    {typeof v === 'object' ? JSON.stringify(v) : String(v)}
+                  </span>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
+
         {/* Excerpt / Raw Grounded Evidence */}
         {item.excerpt && (
           <div className="space-y-1.5">
             <span className="text-[10px] text-muted-foreground uppercase font-semibold block">
-              Grounded Evidence Excerpt
+              Grounded Evidence & Root-Cause Details
             </span>
             <div className="p-3 rounded-xs border border-border/70 bg-muted/20 text-foreground leading-relaxed whitespace-pre-wrap">
               {item.excerpt}
@@ -158,4 +179,3 @@ export function RightDrawer({ isOpen, onClose, item }: RightDrawerProps) {
     </div>
   );
 }
-

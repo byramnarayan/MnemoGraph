@@ -32,7 +32,7 @@ export default function SearchPage() {
   const [graphNodes, setGraphNodes] = useState<GraphNode[]>([]);
   const [graphEdges, setGraphEdges] = useState<GraphEdge[]>([]);
   const [isGraphModalOpen, setIsGraphModalOpen] = useState(false);
-  const [activeQueryTitle, setActiveQueryTitle] = useState<string>('Enterprise Canonical Graph');
+  const [activeQueryTitle, setActiveQueryTitle] = useState<string>('Enterprise Canonical Knowledge Graph');
 
   // Answer & Search State
   const [answerData, setAnswerData] = useState<AnswerData | null>(null);
@@ -63,7 +63,7 @@ export default function SearchPage() {
     setCollectionsLoading(true);
     try {
       const data = await api.hub.listCollections();
-      setCollections(data);
+      setCollections(data || []);
     } catch (err) {
       console.error('Failed to load multi-store collections:', err);
     } finally {
@@ -76,7 +76,7 @@ export default function SearchPage() {
     setHistoryLoading(true);
     try {
       const episodes = await api.hub.getMemoryHistory('asc');
-      setHistory(episodes);
+      setHistory(episodes || []);
     } catch (err) {
       console.error('Failed to load memory history:', err);
     } finally {
@@ -84,13 +84,14 @@ export default function SearchPage() {
     }
   };
 
-  // 3. Fetch User-Scoped Initial Graph
+  // 3. Fetch User-Scoped Initial Graph from FalkorDB
   const loadInitialUserGraph = async () => {
     try {
       const graphData = await api.hub.getUserSubgraph();
       if (graphData && graphData.nodes) {
         setGraphNodes(graphData.nodes);
         setGraphEdges(graphData.edges || []);
+        setActiveQueryTitle('Enterprise Canonical Knowledge Graph');
       }
     } catch (err) {
       console.error('Failed to load user authorized graph:', err);
@@ -141,10 +142,11 @@ export default function SearchPage() {
     }
   };
 
-  // 6. Handle New Question Submission
+  // 6. Handle New Question Submission (Qdrant Vector Retrieval + Groq Synthesis)
   const handleAskQuestion = async (queryText: string) => {
     setSearchLoading(true);
     setActiveQueryTitle(`Query: ${queryText}`);
+
     try {
       const res = await api.hub.search({
         query: queryText,
@@ -257,10 +259,23 @@ export default function SearchPage() {
           <div className="flex items-center gap-2 text-xs text-muted-foreground uppercase tracking-wider">
             <Link href="/" className="hover:text-foreground">Home</Link>
             <span>/</span>
-            <span className="text-foreground">Memory-Enabled Enterprise Search</span>
+            <span className="text-foreground">Enterprise Knowledge & Memory Workspace</span>
           </div>
 
           <div className="flex items-center gap-3">
+            <button
+              onClick={loadInitialUserGraph}
+              className="text-xs px-2.5 py-1 rounded-xs border border-border bg-muted/20 hover:border-accent text-foreground transition-all flex items-center gap-1.5"
+              title="Reload canonical graph topology"
+            >
+              <span>↻ Reset Subgraph</span>
+            </button>
+            <Link
+              href="/hub"
+              className="text-xs px-3 py-1 rounded-xs border border-accent/40 bg-accent/10 hover:bg-accent/20 text-accent transition-all flex items-center gap-1.5"
+            >
+              <span>Knowledge Hub Directory →</span>
+            </Link>
             <Tag tone="accent">
               {isAdmin ? 'ADMIN CLEARANCE' : 'USER CLEARANCE'}
             </Tag>
@@ -275,32 +290,33 @@ export default function SearchPage() {
         </div>
 
         {/* Scrollable Center Area: Canvas on Top + Answer Section in Middle */}
-        <div className="flex-1 overflow-y-auto p-6 space-y-6">
-          {/* Top Area: Initial Graph Canvas */}
+        <div className="flex-1 overflow-y-auto p-6 space-y-5">
+          {/* Graph Canvas */}
           <div className="space-y-2">
             <div className="flex items-center justify-between text-xs text-muted-foreground">
               <span className="uppercase font-semibold text-foreground">
-                Enterprise Knowledge & Memory Subgraph
+                {activeQueryTitle}
               </span>
-              <span>Click nodes to inspect metadata</span>
+              <span>Click nodes to inspect attributes & relationships</span>
             </div>
             <GraphCanvas
               nodes={graphNodes}
               edges={graphEdges}
-              height={260}
+              height={340}
               onNodeClick={(node) => {
                 setDrawerItem({
-                  type: 'citation',
-                  title: `${node.label}: ${node.id}`,
-                  subtitle: `Canonical Node ID: ${node.id}`,
-                  excerpt: JSON.stringify(node.properties || {}, null, 2),
+                  type: 'ontology_node',
+                  title: `${node.label}: ${node.properties?.title || node.properties?.name || node.id}`,
+                  subtitle: `Label: ${node.label} | Node ID: ${node.id}`,
+                  excerpt: node.properties?.description || node.properties?.path || undefined,
+                  metadata: node.properties || {},
                 });
                 setDrawerOpen(true);
               }}
             />
           </div>
 
-          {/* Middle Area: Grounded Answer Section */}
+          {/* Grounded Answer Section */}
           <AnswerSection
             data={answerData}
             loading={searchLoading}
@@ -315,7 +331,7 @@ export default function SearchPage() {
         <QuestionInput onAsk={handleAskQuestion} loading={searchLoading} />
       </main>
 
-      {/* 4. Slide-out Right-Side Drawer (Detailed Source & Citation Inspection) */}
+      {/* 4. Slide-out Right-Side Drawer */}
       <RightDrawer
         isOpen={drawerOpen}
         onClose={() => setDrawerOpen(false)}
