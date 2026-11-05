@@ -39,6 +39,12 @@ export function Navbar() {
                 Search & Q&A
               </Link>
               <Link
+                href="/incident"
+                className="text-muted-foreground hover:text-foreground transition-colors"
+              >
+                Incident Intel
+              </Link>
+              <Link
                 href="/connectors"
                 className="text-muted-foreground hover:text-foreground transition-colors"
               >

@@ -14,6 +14,9 @@ export interface UserResponse {
   industry_vertical?: string | null;
   department?: string | null;
   role: string;
+  clearance_level?: string;
+  is_superuser?: boolean;
+  person_entity_id?: string | null;
   image_file?: string | null;
   image_url: string;
   is_active: boolean;
@@ -300,40 +303,32 @@ export const api = {
         method: 'POST',
         body: formData,
       }),
-  },
 
-  hub: {
-    // People & Knowledge Handover
-    listPeople: (): Promise<any[]> => request<any[]>('/people'),
-    getPerson: (id: string): Promise<any> => request<any>(`/people/${id}`),
-    getPersonFullProfile: (id: string): Promise<any> => request<any>(`/people/${id}/full-profile`),
-    createHandover: (id: string, data: { target_employee_id: string; scope?: string; notes?: string }): Promise<any> =>
-      request<any>(`/people/${id}/handover`, {
+    // PostgreSQL Source Connector
+    testPostgresConnection: (data: any): Promise<any> =>
+      request<any>('/connectors/postgres/test-connection', {
         method: 'POST',
         body: JSON.stringify(data),
       }),
-    getPersonDecisions: (id: string): Promise<any[]> => request<any[]>(`/people/${id}/decisions`),
+    discoverPostgresSchemas: (data: any): Promise<any> =>
+      request<any>('/connectors/postgres/discover-schemas', {
+        method: 'POST',
+        body: JSON.stringify(data),
+      }),
+    createPostgresConnector: (data: any): Promise<any> =>
+      request<any>('/connectors/postgres', {
+        method: 'POST',
+        body: JSON.stringify(data),
+      }),
+    getPostgresConnectorTables: (connectorId: string): Promise<any[]> =>
+      request<any[]>(`/connectors/postgres/${connectorId}/tables`),
+    triggerPostgresSync: (connectorId: string): Promise<any> =>
+      request<any>(`/connectors/postgres/${connectorId}/sync`, {
+        method: 'POST',
+      }),
+  },
 
-    // Teams
-    listTeams: (): Promise<any[]> => request<any[]>('/teams'),
-    getTeam: (id: string): Promise<any> => request<any>(`/teams/${id}`),
-    getTeamDecisions: (id: string): Promise<any[]> => request<any[]>(`/teams/${id}/decisions`),
-
-    // Projects
-    listProjects: (): Promise<any[]> => request<any[]>('/projects'),
-    getProject: (id: string): Promise<any> => request<any>(`/projects/${id}`),
-    getProjectDecisions: (id: string): Promise<any[]> => request<any[]>(`/projects/${id}/decisions`),
-    getProjectMentions: (id: string): Promise<any[]> => request<any[]>(`/projects/${id}/mentions`),
-
-    // Documents
-    listDocuments: (): Promise<any[]> => request<any[]>('/documents'),
-    getDocument: (id: string): Promise<any> => request<any>(`/documents/${id}`),
-    getDocumentSections: (id: string): Promise<any[]> => request<any[]>(`/documents/${id}/sections`),
-    getDocumentEntities: (id: string): Promise<any[]> => request<any[]>(`/documents/${id}/entities`),
-    getDocumentMentions: (id: string): Promise<any[]> => request<any[]>(`/documents/${id}/mentions`),
-    getDocumentDecisions: (id: string): Promise<any[]> => request<any[]>(`/documents/${id}/decisions`),
-    getDocumentPermissions: (id: string): Promise<any> => request<any>(`/documents/${id}/permissions`),
-
+  hub: {
     // Search & Answer Engine
     search: (data: { query: string; project_id?: string; workspace_id?: string; limit?: number }): Promise<any> =>
       request<any>('/search', {

@@ -134,3 +134,72 @@ class MemoryWriteService:
             await db.rollback()
             return episode_id
 
+    async def record_ukgoe_interaction(
+        self,
+        db: AsyncSession,
+        session_id: str,
+        user_id: int | str,
+        query: str,
+        answer: str,
+        confidence_score: float,
+        entity_ids_touched: list[str],
+    ) -> str:
+        """
+        UKGOE Step 5.4: Episodic Memory Persistence via Graphiti:
+        1. PostgreSQL: Writes to agent_episodes.
+        2. FalkorDB: Creates :EpisodeMemory and links [:TOUCHED] edges.
+        """
+        episode_id = str(uuid.uuid4())
+        now = datetime.now(timezone.utc)
+        now_str = now.isoformat()
+
+        try:
+            uid = int(user_id) if str(user_id).isdigit() else 1
+            await db.execute(
+                text("""
+                    INSERT INTO agent_episodes (
+                        id, session_id, user_id, tenant_id, query_text, answer_text,
+                        confidence_score, created_at
+                    ) VALUES (
+                        :id, :sid, :uid, 'universal', :query, :answer,
+                        :conf, NOW()
+                    )
+                """),
+                {
+                    "id": episode_id,
+                    "sid": session_id,
+                    "uid": uid,
+                    "query": query,
+                    "answer": answer,
+                    "conf": confidence_score,
+                },
+            )
+            await db.commit()
+
+            # FalkorDB: Create :EpisodeMemory overlay node & link [:TOUCHED]
+            if entity_ids_touched:
+                clean_q = query.replace("\\", "\\\\").replace("'", "\\'").replace("\n", " ").replace("\r", " ")
+                clean_a = answer[:250].replace("\\", "\\\\").replace("'", "\\'").replace("\n", " ").replace("\r", " ")
+                clean_eids = [str(eid).replace("'", "\\'") for eid in entity_ids_touched if eid]
+                touched_str = ", ".join([f"'{eid}'" for eid in clean_eids])
+                cypher = f"""
+                CREATE (e:EpisodeMemory {{
+                    id: '{episode_id}',
+                    session_id: '{session_id}',
+                    query_text: '{clean_q}',
+                    answer_summary: '{clean_a}',
+                    confidence: {confidence_score},
+                    timestamp: '{now_str}'
+                }})
+                WITH e
+                UNWIND [{touched_str}] AS target_id
+                MATCH (target {{id: target_id}})
+                MERGE (e)-[:TOUCHED]->(target)
+                """
+                self.graphiti.falkor.query(cypher)
+
+            return episode_id
+        except Exception as e:
+            logger.warning(f"Error persisting UKGOE episodic memory: {e}")
+            return episode_id
+

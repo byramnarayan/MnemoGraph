@@ -48,19 +48,28 @@ class QdrantService:
             logger.warning(f"Qdrant collection init check warning: {e}")
 
     def _ensure_payload_indexes(self) -> None:
-        """Ensure document_id and connector_id are indexed as keyword for fast payload filtering."""
+        """Ensure critical payload fields are indexed as keyword for fast payload filtering."""
         try:
             from qdrant_client.http.models import PayloadSchemaType
-            self.client.create_payload_index(
-                collection_name=self.collection_name,
-                field_name="document_id",
-                field_schema=PayloadSchemaType.KEYWORD,
-            )
-            self.client.create_payload_index(
-                collection_name=self.collection_name,
-                field_name="connector_id",
-                field_schema=PayloadSchemaType.KEYWORD,
-            )
-        except Exception:
-            pass
+            fields = [
+                "document_id",
+                "connector_id",
+                "entity_id",
+                "entity_class",
+                "classification",
+                "department",
+                "data_quality_grade",
+                "project_id",
+            ]
+            for field in fields:
+                try:
+                    self.client.create_payload_index(
+                        collection_name=self.collection_name,
+                        field_name=field,
+                        field_schema=PayloadSchemaType.KEYWORD,
+                    )
+                except Exception:
+                    pass
+        except Exception as e:
+            logger.debug(f"Payload index initialization skipped or already present: {e}")
 

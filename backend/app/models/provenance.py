@@ -128,25 +128,6 @@ class DecisionLink(Base):
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=lambda: datetime.now(UTC))
 
 
-# 8. KnowledgeHandover
-class KnowledgeHandover(Base):
-    __tablename__ = "knowledge_handovers"
-
-    id: Mapped[str] = mapped_column(String(36), primary_key=True, default=lambda: str(uuid.uuid4()))
-    source_employee_id: Mapped[str] = mapped_column(String(100), index=True, nullable=False)
-    target_employee_id: Mapped[str] = mapped_column(String(100), index=True, nullable=False)
-    assigned_by_id: Mapped[str] = mapped_column(String(100), nullable=False)
-    status: Mapped[str] = mapped_column(String(50), default="active", nullable=False)
-    scope: Mapped[str | None] = mapped_column(Text, default="all", nullable=True)
-    handover_notes: Mapped[str | None] = mapped_column(Text, nullable=True)
-    created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), default=lambda: datetime.now(UTC))
-    updated_at: Mapped[datetime] = mapped_column(
-        DateTime(timezone=True),
-        default=lambda: datetime.now(UTC),
-        onupdate=lambda: datetime.now(UTC),
-    )
-
-
 # 9. ProjectMember
 class ProjectMember(Base):
     __tablename__ = "project_members"

@@ -29,15 +29,6 @@ async def get_document_decisions(
     return await enricher.get_decisions_for_entity(db=db, entity_type="document", entity_id=document_id)
 
 
-@router.get("/people/{person_id}/decisions")
-async def get_person_decisions(
-    person_id: str,
-    current_user: CurrentUser,
-    db: Annotated[AsyncSession, Depends(get_db)],
-) -> list[dict[str, Any]]:
-    return await enricher.get_decisions_for_entity(db=db, entity_type="person", entity_id=person_id)
-
-
 @router.get("/teams/{team_id}/decisions")
 async def get_team_decisions(
     team_id: str,

@@ -46,12 +46,54 @@ class ResetPasswordRequest(BaseModel):
 class UserResponse(UserBase):
     id: int
     role: str
+    clearance_level: str = "Internal"
+    is_superuser: bool = False
+    person_entity_id: str | None = None
+    location: str | None = None
+    title: str | None = None
     image_file: str | None = None
     image_url: str
     is_active: bool
     created_at: datetime
 
     model_config = ConfigDict(from_attributes=True)
+
+
+class DiscoveredPersonResponse(BaseModel):
+    entity_id: str
+    full_name: str
+    inferred_department: str | None = None
+    inferred_role: str | None = None
+    source_documents: list[str] = []
+    mention_count: int = 1
+    has_existing_user: bool = False
+    is_provisioned: bool = False
+
+
+class ProvisionUserRequest(BaseModel):
+    person_entity_id: str
+    full_name: str
+    email: EmailStr
+    password: str = Field(..., min_length=8, max_length=128)
+    role: str = "Senior Engineer"
+    department: str = "Engineering"
+    clearance_level: str = "Internal"
+    title: str | None = None
+    location: str | None = None
+
+
+class ProvisionedUserResponse(BaseModel):
+    user_id: int
+    person_entity_id: str
+    full_name: str
+    email: str
+    role: str
+    department: str | None = None
+    clearance_level: str
+    title: str | None = None
+    location: str | None = None
+    is_active: bool = True
+    falkordb_synchronized: bool = True
 
 
 class Token(BaseModel):

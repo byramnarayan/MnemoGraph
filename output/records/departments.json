@@ -1,0 +1,9 @@
+[
+{"id":"DEPT-0001","name":"HR","description":"Oversees talent acquisition, employee lifecycle management, learning & development, and organizational design across all circles."},
+{"id":"DEPT-0002","name":"Legal & Compliance","description":"Provides legal advisory, regulatory compliance (TRAI, DoT), contract management, and litigation management services."},
+{"id":"DEPT-0003","name":"Network Operations","description":"Responsible for 24x7 monitoring, incident response, and capacity management of Aarohan's nationwide telecom infrastructure including radio, core, and transport layers."},
+{"id":"DEPT-0004","name":"Customer Experience","description":"Responsible for customer care operations, NPS measurement, complaint resolution, and service quality improvement programs."},
+{"id":"DEPT-0005","name":"Product & Technology","description":"Drives product innovation, technology architecture, and engineering delivery for Aarohan's consumer and enterprise portfolio."},
+{"id":"DEPT-0006","name":"Enterprise Services","description":"Manages the full lifecycle of enterprise B2B accounts including solution design, SLA management, and dedicated account teams."},
+{"id":"DEPT-0007","name":"Sales & Marketing","description":"Owns subscriber acquisition, retention, brand, and go-to-market strategy for consumer and enterprise segments."}
+]

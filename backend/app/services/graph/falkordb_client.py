@@ -21,12 +21,12 @@ class FalkorDBClient:
 
         try:
             parsed = urlparse(self.url)
-            self.host = parsed.hostname or "localhost"
+            self.host = "127.0.0.1" if parsed.hostname in ("localhost", "127.0.0.1") else (parsed.hostname or "127.0.0.1")
             self.port = parsed.port or 6379
             self.username = parsed.username
             self.password = parsed.password
         except Exception:
-            self.host = "localhost"
+            self.host = "127.0.0.1"
             self.port = 6379
             self.username = None
             self.password = None

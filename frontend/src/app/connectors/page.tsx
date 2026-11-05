@@ -17,9 +17,20 @@ import {
   Panel,
   Tag,
 } from '@/kit';
-import { DocumentUploadSection } from './components/DocumentUploadSection';
+import { DocumentUploadSection, PostgresConnectorModal } from './components';
 
 const CONNECTOR_TEMPLATES = [
+  {
+    type: 'postgresql',
+    name: 'PostgreSQL',
+    description: 'Read-only connection to ingest tables into UKGOE ontology, graph, search, and incident intelligence.',
+    icon: (
+      <svg className="w-6 h-6 text-sky-500" viewBox="0 0 24 24" fill="currentColor">
+        <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-1 14.5v-9l6 4.5-6 4.5z" />
+      </svg>
+    ),
+    isSupported: true,
+  },
   {
     type: 'databricks',
     name: 'Databricks',
@@ -77,6 +88,7 @@ export default function ConnectorsPage() {
 
   // Multi-Step Modal State
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isPostgresModalOpen, setIsPostgresModalOpen] = useState(false);
   const [currentStep, setCurrentStep] = useState<1 | 2 | 3>(1);
 
   // Step 1: Credentials
@@ -249,11 +261,16 @@ export default function ConnectorsPage() {
     }
   };
 
-  const handleTriggerSync = async (connectorId: string, mode: 'full' | 'incremental' = 'full') => {
+  const handleTriggerSync = async (connector: ConnectorResponse, mode: 'full' | 'incremental' = 'full') => {
     try {
-      setSyncingId(connectorId);
-      const res = await api.connectors.triggerSync(connectorId, mode);
-      setSuccessBanner(`Sync job ${res.job_id.slice(0, 8)} started in ${mode} mode.`);
+      setSyncingId(connector.id);
+      if (connector.connector_type === 'postgresql') {
+        const res = await api.connectors.triggerPostgresSync(connector.id);
+        setSuccessBanner(`PostgreSQL sync job ${res.job_id.slice(0, 8)} started.`);
+      } else {
+        const res = await api.connectors.triggerSync(connector.id, mode);
+        setSuccessBanner(`Databricks sync job ${res.job_id.slice(0, 8)} started in ${mode} mode.`);
+      }
     } catch (err: any) {
       setErrorBanner(err.message);
     } finally {
@@ -392,14 +409,14 @@ export default function ConnectorsPage() {
                           variant="ghost"
                           className="text-xs h-8 flex-1"
                           disabled={syncingId === c.id}
-                          onClick={() => handleTriggerSync(c.id, 'incremental')}
+                          onClick={() => handleTriggerSync(c, 'incremental')}
                         >
                           {syncingId === c.id ? 'Starting...' : 'Sync (Incr)'}
                         </Button>
                         <Button
                           className="text-xs h-8 flex-1"
                           disabled={syncingId === c.id}
-                          onClick={() => handleTriggerSync(c.id, 'full')}
+                          onClick={() => handleTriggerSync(c, 'full')}
                         >
                           Full Ingest
                         </Button>
@@ -456,8 +473,12 @@ export default function ConnectorsPage() {
                   {item.isSupported ? (
                     <Button
                       onClick={() => {
-                        setCurrentStep(1);
-                        setIsModalOpen(true);
+                        if (item.type === 'postgresql') {
+                          setIsPostgresModalOpen(true);
+                        } else {
+                          setCurrentStep(1);
+                          setIsModalOpen(true);
+                        }
                       }}
                       className="w-full text-xs h-8"
                     >
@@ -730,6 +751,16 @@ export default function ConnectorsPage() {
           </div>
         </div>
       )}
+
+      {/* PostgreSQL Connector Modal */}
+      <PostgresConnectorModal
+        isOpen={isPostgresModalOpen}
+        onClose={() => setIsPostgresModalOpen(false)}
+        onSuccess={() => {
+          setSuccessBanner('PostgreSQL connector created and initial sync triggered!');
+          loadConnectors();
+        }}
+      />
     </div>
   );
 }

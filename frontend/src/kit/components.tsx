@@ -324,23 +324,44 @@ export function EmptyState({ title, children }: { title: string; children?: Reac
 /* ---------- Chrome ---------- */
 
 export function useTheme(initial: 'dark' | 'light' = 'dark') {
-  const [dark, setDark] = useState(initial === 'dark')
+  const [dark, setDark] = useState<boolean>(initial === 'dark');
+  const [mounted, setMounted] = useState<boolean>(false);
+
   useEffect(() => {
-    document.documentElement.classList.toggle('dark', dark)
-  }, [dark])
-  return { dark, toggle: () => setDark((d) => !d) }
+    setMounted(true);
+    const stored = localStorage.getItem('mnemograph_theme');
+    if (stored) {
+      setDark(stored === 'dark');
+    } else {
+      setDark(document.documentElement.classList.contains('dark') || initial === 'dark');
+    }
+  }, [initial]);
+
+  useEffect(() => {
+    if (mounted) {
+      document.documentElement.classList.toggle('dark', dark);
+      localStorage.setItem('mnemograph_theme', dark ? 'dark' : 'light');
+    }
+  }, [dark, mounted]);
+
+  return { dark, toggle: () => setDark((d) => !d), mounted };
 }
 
 export function ThemeToggle({ dark, onToggle }: { dark: boolean; onToggle: () => void }) {
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => {
+    setMounted(true);
+  }, []);
+
   return (
     <button
       type="button"
       onClick={onToggle}
-      aria-pressed={dark}
+      aria-pressed={mounted ? dark : true}
       aria-label="Toggle theme"
       className="rounded-sm border border-border px-2.5 py-1.5 font-mono text-xs text-muted-foreground transition-colors hover:text-foreground"
     >
-      {dark ? 'DARK' : 'LIGHT'}
+      {mounted ? (dark ? 'DARK' : 'LIGHT') : 'DARK'}
     </button>
   )
 }

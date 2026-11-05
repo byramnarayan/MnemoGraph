@@ -1,0 +1,17 @@
+[
+{"id":"TEAM-0001","name":"Talent Acquisition","department_id":"DEPT-0001","primary_site_id":"SITE-0007"},
+{"id":"TEAM-0002","name":"Corporate Legal","department_id":"DEPT-0002","primary_site_id":"SITE-0003"},
+{"id":"TEAM-0003","name":"Regulatory Affairs","department_id":"DEPT-0002","primary_site_id":"SITE-0006"},
+{"id":"TEAM-0004","name":"Radio Access Network Engineering","department_id":"DEPT-0003","primary_site_id":"SITE-0002"},
+{"id":"TEAM-0005","name":"Transport & Backhaul","department_id":"DEPT-0003","primary_site_id":"SITE-0003"},
+{"id":"TEAM-0006","name":"Network Capacity Planning","department_id":"DEPT-0003","primary_site_id":"SITE-0004"},
+{"id":"TEAM-0007","name":"Quality & Insights","department_id":"DEPT-0004","primary_site_id":"SITE-0007"},
+{"id":"TEAM-0008","name":"Data & Analytics","department_id":"DEPT-0005","primary_site_id":"SITE-0001"},
+{"id":"TEAM-0009","name":"Product Management","department_id":"DEPT-0005","primary_site_id":"SITE-0004"},
+{"id":"TEAM-0010","name":"Architecture & Standards","department_id":"DEPT-0005","primary_site_id":"SITE-0001"},
+{"id":"TEAM-0011","name":"SLA & Delivery Management","department_id":"DEPT-0006","primary_site_id":"SITE-0002"},
+{"id":"TEAM-0012","name":"Partner & Channel Management","department_id":"DEPT-0006","primary_site_id":"SITE-0004"},
+{"id":"TEAM-0013","name":"Brand & Digital Marketing","department_id":"DEPT-0007","primary_site_id":"SITE-0008"},
+{"id":"TEAM-0014","name":"Enterprise Sales","department_id":"DEPT-0007","primary_site_id":"SITE-0007"},
+{"id":"TEAM-0015","name":"Consumer Sales","department_id":"DEPT-0007","primary_site_id":"SITE-0008"}
+]

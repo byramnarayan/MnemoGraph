@@ -5,6 +5,7 @@ import { useRouter } from 'next/navigation';
 import { useAuth } from '@/lib/auth-context';
 import { api } from '@/lib/api-client';
 import { Button, Eyebrow, Field, Panel, Callout, Tag } from '@/kit';
+import { Phase8ProvisioningSection } from './components/Phase8ProvisioningSection';
 
 export default function ProfilePage() {
   const router = useRouter();
@@ -126,6 +127,9 @@ export default function ProfilePage() {
           {msg.text}
         </Callout>
       )}
+
+      {/* Phase 8: Discovered Person Provisioning & Manual Onboarding (Top) */}
+      <Phase8ProvisioningSection currentUser={user} />
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
         {/* Left Column: Avatar & S3 Card */}

@@ -1,0 +1,14 @@
+{
+  "seed": 42,
+  "as_of_date": "2025-01-01",
+  "dataset_version": "dc25e11e255d",
+  "generated_at": "2026-11-03T14:10:46.734365+00:00",
+  "entity_counts": {
+    "employees": 44,
+    "projects": 10,
+    "decisions": 46,
+    "incidents": 18,
+    "follow_up_actions": 70,
+    "business_documents": 63
+  }
+}

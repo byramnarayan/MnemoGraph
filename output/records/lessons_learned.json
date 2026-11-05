@@ -1,0 +1,7 @@
+[
+{"id":"LL-0001","project_id":"PROJ-0001","description":"Vendor evaluation criteria must include a 3-year total-cost-of-ownership model and an explicit NSA-to-SA migration path before any procurement decision is ratified at the Architecture Review Board. Cross-functional review from Network Operations and Finance is mandatory for all decisions exceeding ₹2 crore CapEx.","causal_incident_id":null,"causal_decision_id":"DEC-0001"},
+{"id":"LL-0002","project_id":"PROJ-0002","description":"Capacity models for new platform deployments must include a sensitivity analysis for 3x traffic growth scenarios. The IoT platform capacity model used at project approval underestimated traffic growth by 340%, directly causing the P2 incident and a 3-month project delay. All future platform projects must obtain a NOC capacity sign-off before go-live approval is granted.","causal_incident_id":"INC-0003","causal_decision_id":null},
+{"id":"LL-0003","project_id":"PROJ-0006","description":"Architectural decisions with cross-circle impact must be reviewed by at least two independent domain architects.","causal_incident_id":null,"causal_decision_id":null},
+{"id":"LL-0004","project_id":"PROJ-0007","description":"Post-go-live hyper-care periods of minimum 30 days must be budgeted into all projects with customer-facing impact.","causal_incident_id":null,"causal_decision_id":null},
+{"id":"LL-0005","project_id":"PROJ-0010","description":"All integration testing must include a 72-hour production-soak before go-live is approved.","causal_incident_id":null,"causal_decision_id":null}
+]

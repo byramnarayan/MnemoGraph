@@ -1,0 +1,161 @@
+{
+  "dataset_version": "dc25e11e255d",
+  "bucket": "telecom-synthetic-data",
+  "total_files": 19,
+  "successful": 0,
+  "failed": 19,
+  "entries": [
+    {
+      "s3_key": "datasets/dc25e11e255d/config.json",
+      "local_path": "output\\config.json",
+      "status": "failed",
+      "etag": null,
+      "byte_size": 317,
+      "error_message": "An error occurred (NoSuchBucket) when calling the PutObject operation: The specified bucket does not exist."
+    },
+    {
+      "s3_key": "datasets/dc25e11e255d/data_dictionary.md",
+      "local_path": "output\\data_dictionary.md",
+      "status": "failed",
+      "etag": null,
+      "byte_size": 6914,
+      "error_message": "An error occurred (NoSuchBucket) when calling the PutObject operation: The specified bucket does not exist."
+    },
+    {
+      "s3_key": "datasets/dc25e11e255d/evaluation_questions.md",
+      "local_path": "output\\evaluation_questions.md",
+      "status": "failed",
+      "etag": null,
+      "byte_size": 2575,
+      "error_message": "An error occurred (NoSuchBucket) when calling the PutObject operation: The specified bucket does not exist."
+    },
+    {
+      "s3_key": "datasets/dc25e11e255d/file_manifest.json",
+      "local_path": "output\\file_manifest.json",
+      "status": "failed",
+      "etag": null,
+      "byte_size": 3235,
+      "error_message": "An error occurred (NoSuchBucket) when calling the PutObject operation: The specified bucket does not exist."
+    },
+    {
+      "s3_key": "datasets/dc25e11e255d/relationship_manifest.json",
+      "local_path": "output\\relationship_manifest.json",
+      "status": "failed",
+      "etag": null,
+      "byte_size": 80592,
+      "error_message": "An error occurred (NoSuchBucket) when calling the PutObject operation: The specified bucket does not exist."
+    },
+    {
+      "s3_key": "datasets/dc25e11e255d/scenario_bible.md",
+      "local_path": "output\\scenario_bible.md",
+      "status": "failed",
+      "etag": null,
+      "byte_size": 4952,
+      "error_message": "An error occurred (NoSuchBucket) when calling the PutObject operation: The specified bucket does not exist."
+    },
+    {
+      "s3_key": "datasets/dc25e11e255d/validation_report.json",
+      "local_path": "output\\validation_report.json",
+      "status": "failed",
+      "etag": null,
+      "byte_size": 184,
+      "error_message": "An error occurred (NoSuchBucket) when calling the PutObject operation: The specified bucket does not exist."
+    },
+    {
+      "s3_key": "datasets/dc25e11e255d/records/business_documents.json",
+      "local_path": "output\\records\\business_documents.json",
+      "status": "failed",
+      "etag": null,
+      "byte_size": 77602,
+      "error_message": "An error occurred (NoSuchBucket) when calling the PutObject operation: The specified bucket does not exist."
+    },
+    {
+      "s3_key": "datasets/dc25e11e255d/records/company_profile.json",
+      "local_path": "output\\records\\company_profile.json",
+      "status": "failed",
+      "etag": null,
+      "byte_size": 1418,
+      "error_message": "An error occurred (NoSuchBucket) when calling the PutObject operation: The specified bucket does not exist."
+    },
+    {
+      "s3_key": "datasets/dc25e11e255d/records/decisions.json",
+      "local_path": "output\\records\\decisions.json",
+      "status": "failed",
+      "etag": null,
+      "byte_size": 64712,
+      "error_message": "An error occurred (NoSuchBucket) when calling the PutObject operation: The specified bucket does not exist."
+    },
+    {
+      "s3_key": "datasets/dc25e11e255d/records/departments.json",
+      "local_path": "output\\records\\departments.json",
+      "status": "failed",
+      "etag": null,
+      "byte_size": 1348,
+      "error_message": "An error occurred (NoSuchBucket) when calling the PutObject operation: The specified bucket does not exist."
+    },
+    {
+      "s3_key": "datasets/dc25e11e255d/records/employees.json",
+      "local_path": "output\\records\\employees.json",
+      "status": "failed",
+      "etag": null,
+      "byte_size": 42887,
+      "error_message": "An error occurred (NoSuchBucket) when calling the PutObject operation: The specified bucket does not exist."
+    },
+    {
+      "s3_key": "datasets/dc25e11e255d/records/follow_up_actions.json",
+      "local_path": "output\\records\\follow_up_actions.json",
+      "status": "failed",
+      "etag": null,
+      "byte_size": 41052,
+      "error_message": "An error occurred (NoSuchBucket) when calling the PutObject operation: The specified bucket does not exist."
+    },
+    {
+      "s3_key": "datasets/dc25e11e255d/records/incidents.json",
+      "local_path": "output\\records\\incidents.json",
+      "status": "failed",
+      "etag": null,
+      "byte_size": 18158,
+      "error_message": "An error occurred (NoSuchBucket) when calling the PutObject operation: The specified bucket does not exist."
+    },
+    {
+      "s3_key": "datasets/dc25e11e255d/records/lessons_learned.json",
+      "local_path": "output\\records\\lessons_learned.json",
+      "status": "failed",
+      "etag": null,
+      "byte_size": 1586,
+      "error_message": "An error occurred (NoSuchBucket) when calling the PutObject operation: The specified bucket does not exist."
+    },
+    {
+      "s3_key": "datasets/dc25e11e255d/records/milestones.json",
+      "local_path": "output\\records\\milestones.json",
+      "status": "failed",
+      "etag": null,
+      "byte_size": 6673,
+      "error_message": "An error occurred (NoSuchBucket) when calling the PutObject operation: The specified bucket does not exist."
+    },
+    {
+      "s3_key": "datasets/dc25e11e255d/records/projects.json",
+      "local_path": "output\\records\\projects.json",
+      "status": "failed",
+      "etag": null,
+      "byte_size": 17585,
+      "error_message": "An error occurred (NoSuchBucket) when calling the PutObject operation: The specified bucket does not exist."
+    },
+    {
+      "s3_key": "datasets/dc25e11e255d/records/role_histories.json",
+      "local_path": "output\\records\\role_histories.json",
+      "status": "failed",
+      "etag": null,
+      "byte_size": 28152,
+      "error_message": "An error occurred (NoSuchBucket) when calling the PutObject operation: The specified bucket does not exist."
+    },
+    {
+      "s3_key": "datasets/dc25e11e255d/records/teams.json",
+      "local_path": "output\\records\\teams.json",
+      "status": "failed",
+      "etag": null,
+      "byte_size": 1652,
+      "error_message": "An error occurred (NoSuchBucket) when calling the PutObject operation: The specified bucket does not exist."
+    }
+  ]
+}

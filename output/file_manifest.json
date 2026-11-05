@@ -1,0 +1,97 @@
+{
+  "records\\company_profile.json": {
+    "path": "company_profile.json",
+    "byte_size": 1418,
+    "sha256": "f1fbeb1d0c1047d575228273a9e2e7553f26c7f59c02d75b485a720d09ba1991"
+  },
+  "records\\departments.json": {
+    "path": "departments.json",
+    "byte_size": 1348,
+    "sha256": "ee262edfaa7286aa8bdbbf8502a698daf939f5a7b8717bf5d05a3a2372e96170"
+  },
+  "records\\teams.json": {
+    "path": "teams.json",
+    "byte_size": 1652,
+    "sha256": "138de3f4c97d2f60013ea4927735bfc0ddf7144b604a6fc7482c9a1e099ada40"
+  },
+  "records\\employees.json": {
+    "path": "employees.json",
+    "byte_size": 42887,
+    "sha256": "d3f1e59153869578b32b519055a7ef71deac59bab386b2f01498d4914c04e6a0"
+  },
+  "records\\role_histories.json": {
+    "path": "role_histories.json",
+    "byte_size": 28152,
+    "sha256": "b38604c11a45e7d8def8ea0acd4abc132e24af424443509cf22a9daf86dea7db"
+  },
+  "records\\projects.json": {
+    "path": "projects.json",
+    "byte_size": 17585,
+    "sha256": "6c29f4b25410dd496921827c2ca6dd19a3674dd4ed7722c3d82f0662e06ff826"
+  },
+  "records\\milestones.json": {
+    "path": "milestones.json",
+    "byte_size": 6673,
+    "sha256": "af03b58438712c4580e490cf814bf20eabf68cf40deb1f2cf4c0ff79fa3905e9"
+  },
+  "records\\decisions.json": {
+    "path": "decisions.json",
+    "byte_size": 64712,
+    "sha256": "d8ebff029d2b7b6b59698101d9372437fd3afecd9f0dff7a76b0a021d5c7db0c"
+  },
+  "records\\incidents.json": {
+    "path": "incidents.json",
+    "byte_size": 18158,
+    "sha256": "19ee56ad8e1721abc76d4af9177d02d9a9bfda76b2afdca3d75e286419764c09"
+  },
+  "records\\follow_up_actions.json": {
+    "path": "follow_up_actions.json",
+    "byte_size": 41052,
+    "sha256": "5746929806f3cb4969bf6e797da5087b4b4ccfa7ec00379816277e8ad616ec26"
+  },
+  "records\\business_documents.json": {
+    "path": "business_documents.json",
+    "byte_size": 77602,
+    "sha256": "b18cff5b755c92be55770aaac19226812ed0908e979dc32cbd2ce30b8bc48c63"
+  },
+  "records\\lessons_learned.json": {
+    "path": "lessons_learned.json",
+    "byte_size": 1586,
+    "sha256": "16d5a979e19ca204e69406d6355b45c890fae5529c4ed1e88f2cd02fc8fc892d"
+  },
+  "relationship_manifest.json": {
+    "path": "relationship_manifest.json",
+    "byte_size": 80592,
+    "sha256": "1af23be869a5371f9806493ae1d962674d5269e8dff4316832a77b0d7d8331ae"
+  },
+  "config.json": {
+    "path": "config.json",
+    "byte_size": 317,
+    "sha256": "7defe7f36d035dcb985052a1592b39e5bed557689c1f8f1e2fbce05c983ed206"
+  },
+  "data_dictionary.md": {
+    "path": "data_dictionary.md",
+    "byte_size": 6914,
+    "sha256": "de30023afefec3742ed1163acb31c554edf2566e3985f3f883175bce66e64786"
+  },
+  "scenario_bible.md": {
+    "path": "scenario_bible.md",
+    "byte_size": 4952,
+    "sha256": "6780c2c5aae9b7495661170394cac06fa1f18b16caf1d736af4d09ebdfe8e595"
+  },
+  "evaluation_questions.md": {
+    "path": "evaluation_questions.md",
+    "byte_size": 2575,
+    "sha256": "c67f0212ef65df9114644612ff2a27dffa6c4c3e6d88d6ec431d943685695446"
+  },
+  "validation_report.json": {
+    "path": "validation_report.json",
+    "byte_size": 184,
+    "sha256": "719b794e274fc15726593bea59a3b6dc670f7fe2b38bc5f7ac2f5f63069fdb4f"
+  },
+  "upload_report.json": {
+    "path": "upload_report.json",
+    "byte_size": 6721,
+    "sha256": "1b5eb3a96b8bd22bdc3f76ec2d74ca8424e0bb7681b57d7e8f32a18eb11a99a0"
+  }
+}

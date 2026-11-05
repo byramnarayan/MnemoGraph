@@ -58,6 +58,10 @@ class Settings(BaseSettings):
     groq_model: str = "openai/gpt-oss-120b"
     groq_api_base: str = "https://api.groq.com/openai/v1"
 
+    # Hugging Face Configuration (LAnoBERT)
+    huggingface_api_key: SecretStr | None = None
+    hf_token: SecretStr | None = None
+
     # Email server configurations
     mail_server: str = "localhost"
     mail_port: int = 587

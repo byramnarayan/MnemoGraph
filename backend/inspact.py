@@ -3,7 +3,6 @@ import os
 import sys
 from pathlib import Path
 
-# Add backend directory to sys.path
 backend_dir = Path("g:/memoryProject/backend")
 sys.path.insert(0, str(backend_dir))
 os.chdir(str(backend_dir))
@@ -13,22 +12,26 @@ from app.core.database import engine
 from app.services.graph.falkordb_client import FalkorDBClient
 from app.services.vector.qdrant_client import QdrantService
 
+
 async def inspect():
     print("--- POSTGRESQL TABLES ---")
-    async with engine.connect() as conn:
-        res = await conn.execute(text("""
-            SELECT table_name 
-            FROM information_schema.tables 
-            WHERE table_schema = 'public' 
-            ORDER BY table_name;
-        """))
-        tables = [row[0] for row in res.fetchall()]
-        for t in tables:
-            try:
-                cnt = (await conn.execute(text(f'SELECT count(*) FROM "{t}";'))).scalar()
-                print(f"  {t}: {cnt} rows")
-            except Exception as e:
-                print(f"  {t}: error {e}")
+    try:
+        async with engine.connect() as conn:
+            res = await conn.execute(text("""
+                SELECT table_name 
+                FROM information_schema.tables 
+                WHERE table_schema = 'public' 
+                ORDER BY table_name;
+            """))
+            tables = [row[0] for row in res.fetchall()]
+            for t in tables:
+                try:
+                    cnt = (await conn.execute(text(f'SELECT count(*) FROM "{t}";'))).scalar()
+                    print(f"  {t}: {cnt} rows")
+                except Exception as e:
+                    print(f"  {t}: error {e}")
+    finally:
+        await engine.dispose()
 
     print("\n--- FALKORDB ---")
     try:
@@ -54,6 +57,7 @@ async def inspect():
             print(f"  Collection {c.name}: {info.points_count} points")
     except Exception as e:
         print(f"  Qdrant error: {e}")
+
 
 if __name__ == "__main__":
     asyncio.run(inspect())

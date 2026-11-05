@@ -12,24 +12,27 @@ from app.models.connector import (
     SourceEntity,
     Team,
 )
+from app.models.document_section import (
+    DocumentSection,
+    ExtractedEntity,
+)
+from app.models.entity import EntityRecord
 from app.models.provenance import (
     Artifact,
     Decision,
     DecisionLink,
-    KnowledgeHandover,
     Meeting,
     ProjectMember,
     ProvenanceRecord,
     Task,
     Ticket,
 )
-from app.models.document_section import (
-    DecisionMention,
-    DocumentMention,
-    DocumentSection,
-    ExtractedEntity,
-    ProjectMention,
+from app.models.evolution import (
+    ConstraintViolationRecord,
+    InferenceRuleRecord,
+    OntologyEvolutionRecord,
 )
+from app.models.relationship import RelationshipRecord
 from app.models.sync_reconciliation_job import (
     AnswerValidationLog,
     DocumentVersionState,
@@ -37,11 +40,35 @@ from app.models.sync_reconciliation_job import (
     SyncReconciliationJob,
 )
 from app.models.user import PasswordResetToken, User
+from app.models.postgres_connector import PostgresTableConfig
+from app.models.action_proposal import ActionProposalDraft
+from app.models.graph_analytics import GraphAnalyticsSnapshot
+from app.models.validation import (
+    CascadeLogRecord,
+    ConflictRecord,
+    EntityAccessLogRecord,
+    InferenceEventRecord,
+    ValidationLogRecord,
+)
 
 __all__ = [
     "Base",
     "User",
     "PasswordResetToken",
+    "EntityRecord",
+    "RelationshipRecord",
+    "ConflictRecord",
+    "ValidationLogRecord",
+    "PostgresTableConfig",
+    "InferenceEventRecord",
+    "CascadeLogRecord",
+    "EntityAccessLogRecord",
+    "OntologyEvolutionRecord",
+    "InferenceRuleRecord",
+    "ConstraintViolationRecord",
+    "Document",
+    "DocumentSection",
+    "ExtractedEntity",
     "ConnectorConfig",
     "ConnectorSyncJob",
     "SourceEntity",
@@ -52,7 +79,6 @@ __all__ = [
     "Team",
     "Department",
     "Project",
-    "Document",
     "Decision",
     "Task",
     "Ticket",
@@ -60,15 +86,11 @@ __all__ = [
     "Artifact",
     "ProvenanceRecord",
     "DecisionLink",
-    "KnowledgeHandover",
     "ProjectMember",
-    "DocumentSection",
-    "ExtractedEntity",
-    "DocumentMention",
-    "ProjectMention",
-    "DecisionMention",
     "SyncReconciliationJob",
     "DocumentVersionState",
     "PermissionPolicy",
     "AnswerValidationLog",
+    "ActionProposalDraft",
+    "GraphAnalyticsSnapshot",
 ]

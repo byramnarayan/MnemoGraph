@@ -7,7 +7,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from app.core.database import get_db
 from app.core.deps import CurrentUser
 from app.models.connector import Document, DocumentMetadata, Person, Project, Team
-from app.models.provenance import Decision, KnowledgeHandover
+from app.models.provenance import Decision
 from app.services.graph.falkordb_client import FalkorDBClient
 from app.services.vector.qdrant_client import QdrantService
 
@@ -41,13 +41,29 @@ async def list_collections(
 
     collections: list[dict[str, Any]] = []
 
-    # 1. FALKORDB GRAPH COLLECTIONS
+    # 1. FALKORDB GRAPH COLLECTIONS (UNIVERSAL ONTOLOGY TIERS 0-5)
     try:
+        seen_labels: set[str] = set()
         labels_res = falkor_client.query("MATCH (n) RETURN DISTINCT labels(n)")
+        
+        # Universal schema labels from UKGOE Part 2
+        allowed_universal_labels = {
+            "Person", "Project", "Incident", "Decision", "Document",
+            "Task", "System", "Group", "Location", "Role", "Lesson",
+            "Finding", "Process", "Milestone", "Concept", "Metric",
+            "Organization", "Domain"
+        }
+
         for row in labels_res:
             if not row or not row[0]:
                 continue
-            lbl = row[0][0]
+            # Labels can be a list: take recognized universal labels
+            for raw_lbl in row[0]:
+                if raw_lbl in allowed_universal_labels and raw_lbl not in seen_labels:
+                    seen_labels.add(raw_lbl)
+
+        # Sort labels predictably
+        for lbl in sorted(seen_labels):
             count_res = falkor_client.query(f"MATCH (n:{lbl}) RETURN count(n)")
             cnt = count_res[0][0] if count_res else 0
             
@@ -60,18 +76,39 @@ async def list_collections(
                 "name": f"{lbl} Graph Network",
                 "store_type": "FalkorDB",
                 "entity_count": cnt,
-                "description": f"Knowledge graph node partition for {lbl} entities and multi-hop relationships.",
+                "description": f"Universal knowledge graph node partition for {lbl} entities and multi-hop relationships.",
                 "can_delete": is_admin,
             })
     except Exception as e:
-        pass
+        logger.error(f"Error querying FalkorDB collections: {e}")
 
-    # 2. POSTGRESQL RELATIONAL COLLECTIONS
+    # 2. POSTGRESQL RELATIONAL LEDGER COLLECTIONS
     try:
+        from app.models.entity import EntityRecord
+        from app.models.relationship import RelationshipRecord
+
+        entity_count = (await db.execute(select(func.count(EntityRecord.entity_id)))).scalar() or 0
+        rel_count = (await db.execute(select(func.count(RelationshipRecord.id)))).scalar() or 0
         doc_count = (await db.execute(select(func.count(Document.id)))).scalar() or 0
         dec_count = (await db.execute(select(func.count(Decision.id)))).scalar() or 0
         proj_count = (await db.execute(select(func.count(Project.id)))).scalar() or 0
 
+        collections.append({
+            "id": "pg_canonical_entities",
+            "name": "Canonical Entities Ledger",
+            "store_type": "PostgreSQL",
+            "entity_count": entity_count,
+            "description": "UKGOE Relational ledger of verified Tier 0-5 entities, quality grades, and completeness audits.",
+            "can_delete": is_admin,
+        })
+        collections.append({
+            "id": "pg_relationships",
+            "name": "Universal Relationship Ledger",
+            "store_type": "PostgreSQL",
+            "entity_count": rel_count,
+            "description": "Cross-cutting directed edges across Structural, Operational, Causal, and Knowledge taxonomies.",
+            "can_delete": is_admin,
+        })
         collections.append({
             "id": "pg_documents",
             "name": "Enterprise Documents & Notebooks",
@@ -85,19 +122,11 @@ async def list_collections(
             "name": "Strategic Architectural Decisions",
             "store_type": "PostgreSQL",
             "entity_count": dec_count,
-            "description": "Ratified ADRs and SEV-1 incident retrospectives with timelines and RCA learnings.",
-            "can_delete": is_admin,
-        })
-        collections.append({
-            "id": "pg_projects",
-            "name": "Active Engineering Projects",
-            "store_type": "PostgreSQL",
-            "entity_count": proj_count,
-            "description": "Cross-functional engineering project repositories and contributor mappings.",
+            "description": "Ratified ADRs and incident retrospectives with timelines and RCA learnings.",
             "can_delete": is_admin,
         })
     except Exception as e:
-        pass
+        logger.error(f"Error querying PostgreSQL collections: {e}")
 
     # 3. OBJECT STORAGE / DATASET PARTITIONS
     storage_partitions = [

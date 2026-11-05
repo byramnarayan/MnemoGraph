@@ -121,3 +121,72 @@ class PermissionResolver:
             reason="access_denied_insufficient_grants",
             grants=grants,
         )
+
+    # -------------------------------------------------------------
+    # UKGOE Step 5.2: Absolute Security & RBAC Enforcement (INV-05)
+    # -------------------------------------------------------------
+    CLEARANCE_MAP = {
+        "Public": 0,
+        "Internal": 1,
+        "Confidential": 2,
+        "Restricted": 3,
+    }
+
+    @classmethod
+    def get_clearance_rank(cls, clearance: str | int | None) -> int:
+        if isinstance(clearance, int):
+            return clearance
+        return cls.CLEARANCE_MAP.get(clearance or "Internal", 1)
+
+    @classmethod
+    def is_entity_authorized(cls, classification: str | None, user_clearance: str | int = "Internal") -> bool:
+        """
+        Entity-level clearance check: omits node if node classification rank > user clearance rank.
+        """
+        user_rank = cls.get_clearance_rank(user_clearance)
+        node_rank = cls.get_clearance_rank(classification)
+        return node_rank <= user_rank
+
+    is_node_authorized = is_entity_authorized
+
+    @classmethod
+    def is_path_authorized(cls, path_nodes: list[dict[str, Any]], user_clearance: str | int = "Internal") -> bool:
+        """
+        Path-level absolute boundary enforcement:
+        If ANY node along the multi-hop traversal path exceeds user clearance,
+        drop the entire path to prevent partial identity leakage.
+        """
+        user_rank = cls.get_clearance_rank(user_clearance)
+        for node in path_nodes:
+            node_classification = node.get("classification")
+            node_rank = cls.get_clearance_rank(node_classification)
+            if node_rank > user_rank:
+                return False
+        return True
+
+    @classmethod
+    async def log_access_attempt(
+        cls,
+        db: AsyncSession,
+        user_id: str,
+        entity_id: str,
+        access_level: str,
+        granted: bool,
+        reason: str | None = None,
+    ) -> None:
+        """
+        Audits entity access attempts into entity_access_log.
+        """
+        try:
+            from app.models.validation import EntityAccessLogRecord
+            rec = EntityAccessLogRecord(
+                user_id=str(user_id),
+                entity_id=str(entity_id),
+                access_level=access_level,
+                granted=granted,
+                reason=reason,
+            )
+            db.add(rec)
+            await db.commit()
+        except Exception as e:
+            logger.warning(f"Could not log entity access attempt: {e}")
